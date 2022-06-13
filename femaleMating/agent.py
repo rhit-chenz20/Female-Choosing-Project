@@ -1,0 +1,59 @@
+import copy
+
+# from mesa import Agent
+
+
+# class Female(Agent):
+class Female():
+    """
+    A female of the general population
+
+    Attributes:
+        threshold: the threshold which is used to choose the mate
+    """
+
+    def __init__(
+        self,
+        val, #threshold
+        # length of genome
+    ):
+        """
+        Create a new Female.
+        """
+        super().__init__()
+        self.threshold = copy.deepcopy(val)
+        self.fitness = 0
+        self.mates = []
+
+    # def look(self):
+    #     """
+    #     Look at the male's fitness
+    #     """
+
+    def mate(self, male):
+        """
+        Mate with current male
+        """
+        self.mates.append(male)
+        self.cal_fitness()
+
+    def calFitness(self):
+        """
+        Calculate the female's fitness by averaging her mated males' fitness
+        """
+        self.fitness = sum(self.mates) / len(self.mates)
+
+    def mutate(self):
+        """
+        Mutate current threshold
+        """
+    def getFitness(self):
+        return self.fitness
+    
+    def getThreshold(self):
+        return self.threshold
+
+class Randomizer():
+    def val(self):
+        return 1
+        # return random.randint(0,100)
