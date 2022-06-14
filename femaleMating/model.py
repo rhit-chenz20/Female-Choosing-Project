@@ -1,4 +1,4 @@
-# import mesa
+import mesa
 import statistics
 import random
 import csv
@@ -6,8 +6,8 @@ import csv
 from agent import Female
 
 
-#class FemaleMatingModel(mesa.Model):
-class FemaleMatingModel():
+class FemaleMatingModel(mesa.Model):
+#class FemaleMatingModel():
     """
 
     """
@@ -66,9 +66,9 @@ class Randomizer():
         return 20
         # return random.randint(0,100)
 
-# def main():
-#     model = FemaleMatingModel(10)
+def main():
+    model = FemaleMatingModel(10)
 
-# if __name__ == "__main__":
-#     main()
+if __name__ == "__main__":
+    main()
 
