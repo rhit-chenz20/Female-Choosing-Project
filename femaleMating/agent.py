@@ -1,10 +1,9 @@
 import copy
 
-# from mesa import Agent
+from mesa import Agent
 
 
-# class Female(Agent):
-class Female():
+class Female(Agent):
     """
     A female of the general population
 
@@ -30,23 +29,32 @@ class Female():
     #     Look at the male's fitness
     #     """
 
-    def mate(self, male):
-        """
-        Mate with current male
-        """
-        self.mates.append(male)
-        self.cal_fitness()
+    """
+    Check to see if mate with the male or not
+    """
+    def step(self, male):
+        if(male >= self.threshold):
+            self.mate(male)
 
+    """
+    Mate with current male
+    """
+    def mate(self, male):
+        self.mates.append(male)
+        self.calFitness()
+
+    """
+    Calculate the female's fitness by averaging her mated males' fitness
+    """
     def calFitness(self):
-        """
-        Calculate the female's fitness by averaging her mated males' fitness
-        """
         self.fitness = sum(self.mates) / len(self.mates)
 
+    """
+    Mutate current threshold
+    """
     def mutate(self):
-        """
-        Mutate current threshold
-        """
+        ""
+        
     def getFitness(self):
         return self.fitness
     

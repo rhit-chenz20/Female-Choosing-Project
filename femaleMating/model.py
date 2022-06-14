@@ -2,59 +2,117 @@ import mesa
 import statistics
 import random
 import csv
+import numpy as np
+from queue import PriorityQueue
 
-from agent import Female
-
+from .agent import Female
 
 class FemaleMatingModel(mesa.Model):
-#class FemaleMatingModel():
     """
 
     """
-
     def __init__(
         self,
-        size,
-
+        femaleSize,
+        matingLength,
+        maleMu,
+        maleSigma,
+        maleSize,
+        mutationMu,
+        generations,
+        startingRange
     ):
         super().__init__()
-        ran = Randomizer()
+        ran = Randomizer(maleMu, maleSigma, startingRange)
         self.females = []
-        self.generateFemale(size, ran)
+        self.males = []
+        self.matingLength = matingLength
+        self.generateFemale(femaleSize, ran)
+        self.generateMale(maleMu, maleSigma, maleSize)
         self.path = "/Users/andrea/Documents/GitHub/Female-Choosing-Project/db.csv"
-        self.mean = 0
-        self.sdv = 0
+        self.writeToFile(["Generation", "Average Fitness", "Stddev Fitness", "Average Threshold", "Stdev Threhold"]) 
+        self.generation = 0
+        self.maxGen = generations
+        self.evolve(ran)
+        s = PriorityQueue()
 
+    def evolve(self, ran):
+        while(self.generation < self.maxGen):
+            for female in self.females:
+                for i in range(self.matingLength):
+                    male = self.males[ran.ranInt(len(self.males))]
+                    female.step(male)
+            self.writeToFile([self.generation, self.calMeanFit(), self.calDivFit(), self.calMeanThres(), self.calDivThres()])
+            self.generation += 1
+            self.reproduce()
+
+    def reproduce(self):
+        parent = self.chooseParent()
+        p = parent.pop()
+
+    """
+    
+    """
+    def chooseParent(self):
+        parent = PriorityQueue(maxsize=(len(self.females) / 2))
+        for female in self.females:
+            parent.put((-female.getFitness(),female))
+        return parent
+
+    """
+    Generate females with random threshold within range
+    """
     def generateFemale(self, size, ran):
-        """
-        Randomly generate females
-        """
         for x in range(size):
-            print(x)
-            # self.females[x] = Female(ran.val())
-            
-            # print(self.females[x].threshold)
+            self.females[x] = Female(ran.threVal())
+            # generate bitstring
+            # random.randbytes(n)
 
+    """
+    Generate certain number of males from a normal distribution
+    """
+    def generateMale(self, mu, sigma, size):
+        self.male = np.random.normal(mu, sigma, size)
+    
+    """
+    Calculate the fitness' mean of current generation
+    """
+    def calMeanFit(self):
+        total = 0
+        for x in range(len(self.females)):
+            total += self.females[x].getFitness()
+        return total / len(self.females)
 
-        
+    """
+    Calculate the fitness' standard deviation of current generation
+    """
+    def calDivFit(self):
+        fitnesses = []
+        for x in range(len(self.females)):
+            fitnesses.append(self.females[x].getFitness())
+        return statistics.pstdev(fitnesses)
 
-
-        # mean = sum(test_list) / len(test_list)
-        # standard deviation of a list
-        # statistics.pstdev(test_list)
-       
+    """
+    Calculate the thresholds' mean of current generation
+    """
     def calMeanThres(self):
         total = 0
         for x in range(len(self.females)):
             total += self.females[x].getThreshold()
-        self.mean = total/ len(self.females)
+        return total/ len(self.females)
 
+    """
+    Calculate the thresholds' standard deviation of current generation
+    """
     def calDivThres(self):
         thresholds = []
         for x in range(len(self.females)):
             thresholds.append(self.females[x].getThreshold())
-        self.sdv = statistics.pstdev(thresholds)
+        return statistics.pstdev(thresholds)
 
+    """
+    Write a row into csv file
+    """
     def writeToFile(self, row):
         file = open(self.path, "w")
         writer = csv.writer(file)
@@ -62,13 +120,27 @@ class FemaleMatingModel(mesa.Model):
         file.close()
 
 class Randomizer():
-    def val(self):
+    def __init__(
+        self,
+        maleMu,
+        maleSigma,
+        startingRange
+    ):
+        super().__init__()
+        self.mu = maleMu
+        self.sigma = maleSigma
+        self.range = startingRange
+
+    def threVal(self):
         return 20
-        # return random.randint(0,100)
+        # return random.randrange(self.mu - self.range * self.sigma,self.mu + self.range * self.sigma)
 
-def main():
-    model = FemaleMatingModel(10)
+    def ranInt(self, size):
+        return 2
+        # return random.randint(size)
+# def main():
+#     model = FemaleMatingModel(10)
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     main()
 

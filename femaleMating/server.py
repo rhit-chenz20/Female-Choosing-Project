@@ -1,7 +1,7 @@
 import mesa
 
-from .model import EpsteinCivilViolence
-from .agent import Citizen, Cop
+from .model import FemaleMatingModel
+from .agent import Female
 
 
 COP_COLOR = "#000000"
