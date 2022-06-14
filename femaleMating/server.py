@@ -21,34 +21,35 @@ def citizen_cop_portrayal(agent):
         "Filled": "true",
     }
 
-    if type(agent) is Citizen:
-        color = (
-            AGENT_QUIET_COLOR if agent.condition == "Quiescent" else AGENT_REBEL_COLOR
-        )
-        color = JAIL_COLOR if agent.jail_sentence else color
-        portrayal["Color"] = color
-        portrayal["r"] = 0.8
-        portrayal["Layer"] = 0
+    # if type(agent) is Citizen:
+    #     color = (
+    #         AGENT_QUIET_COLOR if agent.condition == "Quiescent" else AGENT_REBEL_COLOR
+    #     )
+    #     color = JAIL_COLOR if agent.jail_sentence else color
+    #     portrayal["Color"] = color
+    #     portrayal["r"] = 0.8
+    #     portrayal["Layer"] = 0
 
-    elif type(agent) is Cop:
-        portrayal["Color"] = COP_COLOR
-        portrayal["r"] = 0.5
-        portrayal["Layer"] = 1
+    # elif type(agent) is Cop:
+    #     portrayal["Color"] = COP_COLOR
+    #     portrayal["r"] = 0.5
+    #     portrayal["Layer"] = 1
     return portrayal
 
 
 model_params = dict(
-    height=40,
-    width=40,
-    citizen_density=0.7,
-    cop_density=0.074,
-    citizen_vision=7,
-    cop_vision=7,
-    legitimacy=0.8,
-    max_jail_term=1000,
+    femaleSize = 100,
+    matingLength = 20,
+    maleMu = 10,
+    maleSigma = 10,
+    maleSize = 1000,
+    mutationMu = 10,
+    generations = 10,
+    startingRange = 3
 )
 
-canvas_element = mesa.visualization.CanvasGrid(citizen_cop_portrayal, 40, 40, 480, 480)
+# canvas_element = mesa.visualization.CanvasGrid(citizen_cop_portrayal, 40, 40, 480, 480)
 server = mesa.visualization.ModularServer(
-    EpsteinCivilViolence, [canvas_element], "Epstein Civil Violence", model_params
+    FemaleMatingModel, [], "Epstein Civil Violence", model_params
 )
+server.port = 8521

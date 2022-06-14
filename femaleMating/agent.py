@@ -1,5 +1,5 @@
 import copy
-
+import numpy as np
 from mesa import Agent
 
 
@@ -15,11 +15,14 @@ class Female(Agent):
         self,
         val, #threshold
         # length of genome
+        unique_id,
+        model
     ):
         """
         Create a new Female.
         """
-        super().__init__()
+        super().__init__(unique_id,
+        model)
         self.threshold = copy.deepcopy(val)
         self.fitness = 0
         self.mates = []
@@ -32,9 +35,12 @@ class Female(Agent):
     """
     Check to see if mate with the male or not
     """
-    def step(self, male):
-        if(male >= self.threshold):
-            self.mate(male)
+    def step(self):
+        if(self.currentMale >= self.threshold):
+            self.mate(self.currentMale)
+
+    def setCurrentMale(self, male):
+        self.currentMale = male
 
     """
     Mate with current male
@@ -52,14 +58,18 @@ class Female(Agent):
     """
     Mutate current threshold
     """
-    def mutate(self):
-        ""
-        
+    def mutate(self, sigma):
+        self.threshold += np.random.normal(0,sigma)
+
     def getFitness(self):
         return self.fitness
     
     def getThreshold(self):
         return self.threshold
+    
+    def __lt__(self, otherF):
+        return self.fitness < otherF.fitness
+
 
 class Randomizer():
     def val(self):
