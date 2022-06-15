@@ -2,7 +2,14 @@
 # server.launch()
 
 from femaleMating.model import FemaleMatingModel
-model = FemaleMatingModel(10,4,2,3,10,1,10,2)
+model = FemaleMatingModel(
+    femaleSize = 10,
+    matingLength = 5,
+    maleMu = 5,
+    maleSigma = 1,
+    mutationSigma = 1,
+    generations = 1000,
+    startingRange = 4)
 
-for i in range(10):
+for i in range(1000):
     model.step()

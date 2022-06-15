@@ -3,7 +3,6 @@ import statistics
 import random
 import csv
 import numpy as np
-from queue import PriorityQueue
 
 from .agent import Female
 
@@ -17,8 +16,7 @@ class FemaleMatingModel(mesa.Model):
         matingLength,
         maleMu,
         maleSigma,
-        maleSize,
-        mutationMu,
+        mutationSigma,
         generations,
         startingRange
     ):
@@ -34,17 +32,18 @@ class FemaleMatingModel(mesa.Model):
         self.maleDiv = maleSigma
         self.generation = 0
         self.maxGen = generations
+        self.mutationSigma = mutationSigma
         file = open("/Users/andrea/Documents/GitHub/Female-Choosing-Project/db.csv", "w")
         self.writer = csv.writer(file)
         self.writeToFile(["Generation", "Average Fitness", "Stddev Fitness", "Average Threshold", "Stdev Threhold"])
         
 
     def step(self):
-        if(self.generation < self.maxGen):
+        if(self.generation <= self.maxGen):
             self.evolve()
+            # print(str(self.generation)+","+str(self.calMeanThres()))
             self.generation += 1
-            print(self.generation)
-            print(self.calMeanThres())
+            
             self.schedule.step()
         else:
             print("End of simulation")
@@ -59,24 +58,39 @@ class FemaleMatingModel(mesa.Model):
                 # sample a random male from the distribution
                 male = np.random.normal(self.maleMu, self.maleDiv)
                 female.setCurrentMale(male)
+                # for test without mesa
+                female.step()
         self.writeToFile([self.generation, self.calMeanFit(), self.calDivFit(), self.calMeanThres(), self.calDivThres()])         
-        # self.reproduce()
+        self.reproduce()
 
     """
     
     """
     def reproduce(self):
         parent = self.chooseParent()
-        p = parent.pop()
+        for x in range(len(self.females)):
+            index = self.ran.ranInt(len(parent))
+            child = Female(parent[index].getThreshold(), x, self)
+            child.mutate(self.mutationSigma)
+            self.females[x] = child
+            # print(str(parent[x].getThreshold()) + ",   " + str(parent[x].getFitness()))
+        # print("--------")
+
+        # p = parent.pop()
 
     """
-    
+    Choose top 50% females to be the parent
     """
     def chooseParent(self):
-        parent = PriorityQueue(maxsize=(len(self.females) / 2))
-        for female in self.females:
-            parent.put((-female.getFitness(),female))
+        self.sortFemale()
+        parent = []
+        for x in range(int(len(self.females)/2)):
+            # parent.append((-self.females[x].getFitness(),self.females[x]))
+            parent.append(self.females[x])
         return parent
+
+    def sortFemale(self):
+        self.females.sort(reverse=True)
 
     """
     Generate females with random threshold within range
@@ -92,8 +106,8 @@ class FemaleMatingModel(mesa.Model):
     """
     Generate certain number of males from a normal distribution
     """
-    def generateMale(self, mu, sigma, size):
-        self.males = np.random.normal(mu, sigma, size)
+    # def generateMale(self, mu, sigma, size):
+    #     self.males = np.random.normal(mu, sigma, size)
     
     """
     Calculate the fitness' mean of current generation
@@ -120,7 +134,7 @@ class FemaleMatingModel(mesa.Model):
         total = 0
         for x in range(len(self.females)):
             total += self.females[x].getThreshold()
-        return total/ len(self.females)
+        return total / len(self.females)
 
     """
     Calculate the thresholds' standard deviation of current generation
