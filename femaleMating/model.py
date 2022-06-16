@@ -18,7 +18,9 @@ class FemaleMatingModel(mesa.Model):
         maleSigma,
         mutationSigma,
         generations,
-        startingRange
+        startingRange,
+        selection,
+        filename
     ):
         super().__init__()
         self.ran = Randomizer(maleMu, maleSigma, startingRange)
@@ -33,28 +35,31 @@ class FemaleMatingModel(mesa.Model):
         self.generation = 0
         self.maxGen = generations
         self.mutationSigma = mutationSigma
-        file = open("/Users/andrea/Documents/GitHub/Female-Choosing-Project/db.csv", "w")
-        self.writer = csv.writer(file)
-        self.writeToFile(["Generation", "Average Fitness", "Stddev Fitness", "Average Threshold", "Stdev Threhold"])
-        
+        self.selection = selection
+        self.file = open("/Users/andrea/Documents/GitHub/Female-Choosing-Project/CSV result files/" + selection + "/" + filename + ".csv", "w+")
+        self.writer = csv.writer(self.file)
+        self.writeToFile(["Generation", "Average Fitness", "Stddev Fitness", "Average Threshold", "Stdev Threhold", 
+            "Male's Mu: " + str(self.maleMu), "Male Sigma: " + str(self.maleDiv), "Mating length: " + str(self.matingLength),
+            "Mutation sigma: " + str(self.mutationSigma), "Starting range: " + str(startingRange)])
+        # for running without mesa
+        for x in range(self.maxGen):
+            self.step()
 
     def step(self):
         if(self.generation <= self.maxGen):
             self.evolve()
-            # print(str(self.generation)+","+str(self.calMeanThres()))
             self.generation += 1
-            
             self.schedule.step()
         else:
             print("End of simulation")
             self.file.close()
 
     def evolve(self):
-
         for female in self.females:
             for i in range(self.matingLength):
                 # choose a male from a predetermined male group
                 # male = self.males[self.ran.ranInt(len(self.males))]
+
                 # sample a random male from the distribution
                 male = np.random.normal(self.maleMu, self.maleDiv)
                 female.setCurrentMale(male)
@@ -67,28 +72,54 @@ class FemaleMatingModel(mesa.Model):
     
     """
     def reproduce(self):
+
         parent = self.chooseParent()
         for x in range(len(self.females)):
             index = self.ran.ranInt(len(parent))
             child = Female(parent[index].getThreshold(), x, self)
             child.mutate(self.mutationSigma)
             self.females[x] = child
-            # print(str(parent[x].getThreshold()) + ",   " + str(parent[x].getFitness()))
-        # print("--------")
-
-        # p = parent.pop()
 
     """
-    Choose top 50% females to be the parent
+    Choose females to be the parent
     """
     def chooseParent(self):
         self.sortFemale()
+        if self.selection == "top50" :
+            return self.top50()
+        elif self.selection == "tournament":
+            return self.tournament()
+
+    """
+    Choose the top 50% of females as the parent
+    """
+    def top50(self):
         parent = []
         for x in range(int(len(self.females)/2)):
-            # parent.append((-self.females[x].getFitness(),self.females[x]))
             parent.append(self.females[x])
         return parent
+    
+    """
+    Use the tournament selection to choose parent
+    """
+    def tournament(self):
+        parent = []
+        # Select two random females from the population
+        # Choose the one with higher fitness
+        for x in range(int(len(self.females)/2)):
+            index1 = self.ran.ranInt(len(self.females))
+            index2 = self.ran.ranInt(len(self.females))
+            if(index1 == index2):
+                index2 = self.ran.ranInt(len(self.females))
+            if(self.females[index1].getFitness() >= self.females[index2].getFitness()):
+                parent.append(self.females[index1])
+            else:
+                parent.append(self.females[index2])
+        return parent
 
+    """
+    Sort the females using fitness
+    """
     def sortFemale(self):
         self.females.sort(reverse=True)
 
@@ -150,7 +181,6 @@ class FemaleMatingModel(mesa.Model):
     """
     def writeToFile(self, row):
         self.writer.writerow(row)
-        # print(self.generation)
 
 class Randomizer():
     def __init__(
@@ -165,15 +195,8 @@ class Randomizer():
         self.range = startingRange
 
     def threVal(self):
-        # return 10
         return random.randrange(self.mu - self.range * self.sigma,self.mu + self.range * self.sigma)
 
     def ranInt(self, size):
-        return 2
-        # return random.randint(size)
-# def main():
-#     model = FemaleMatingModel(10)
-
-# if __name__ == "__main__":
-#     main()
+        return random.randint(0, size - 1)
 

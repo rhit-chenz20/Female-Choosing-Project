@@ -71,7 +71,7 @@ class Female(Agent):
         return self.fitness < otherF.fitness
 
 
-class Randomizer():
-    def val(self):
-        return 1
-        # return random.randint(0,100)
+# class Randomizer():
+#     def val(self):
+#         return 1
+#         # return random.randint(0,100)
