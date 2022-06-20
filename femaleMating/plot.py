@@ -1,34 +1,40 @@
-from fileinput import filename
 import os
-from matplotlib import markers
 import pandas as pd
 import matplotlib.pyplot as plt
-import matplotlib.lines as ln
 
 # get help from https://stackoverflow.com/a/48126960
 class Plot():
     def __init__(
         self,
-        plot50,
-        plotTour
+        filename
         ):
-        path = "/Users/andrea/Documents/GitHub/Female-Choosing-Project/CSV result files"
-        paths = [path + "/top50", path + "/tournament"]
-        if(plot50):
-            self.plot(paths[0])
-        if(plotTour):
-            self.plot(paths[1])
+        self.date = "June20/"
+        self.filename = filename
+        self.inputpath = "/Users/andrea/Documents/GitHub/Female-Choosing-Project/CSVResultFiles/" + self.date
+        self.outputPath = "/Users/andrea/Documents/GitHub/Female-Choosing-Project/ResultPlot/"
+        self.plot()
     
-    def plot(self, path):
-        fileNames = os.listdir(path)
+    def plot(self):
+        fileNames = os.listdir(self.inputpath)
         fileNames = [file for file in fileNames if '.csv' in file]
+        data1 = []
+
         for file in fileNames:
-            gen = pd.read_csv(path + "/" + file, index_col=0)
-            af = pd.read_csv(path + "/" + file, index_col=1)
-            at = pd.read_csv(path + "/" + file, index_col=3)
-            plt.plot(af, 'b.')
-            # plt.plot(at, 'r.')
-        plt.title("Female's Fitness Eveolved over Generations")
-        plt.xlabel("Female's Fitness")
-        plt.ylabel("Generation")
-        plt.show()
+            df = pd.read_csv(self.inputpath + "/" + file, index_col=False)
+            data1.append(df)
+
+        # print(data) concat
+        data1_cancat = pd.concat(objs=data1)
+        # print(data1_cancat)
+        foo = data1_cancat.groupby(level=0).mean()
+        foo.plot(kind='scatter', x='Generation', y='Average Threshold')
+        plt.savefig(self.outputPath + self.date + self.filename + ".png")
+        # plt.show()
+        # data2 = pd.DataFrame(data = data1)
+        
+        # for df in data1:
+
+        #     print(df.get("Average Fitness"))
+
+            # df.plot(kind='scatter', x='Generation', y='Average Fitness')
+            # fig.savefig(self.outputPath + self.date + self.filename)

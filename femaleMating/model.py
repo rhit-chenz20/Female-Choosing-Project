@@ -20,15 +20,17 @@ class FemaleMatingModel(mesa.Model):
         generations,
         startingRange,
         selection,
+        fitness,
         filename
     ):
         super().__init__()
+        date = "June20"
         self.ran = Randomizer(maleMu, maleSigma, startingRange)
         self.schedule = mesa.time.RandomActivation(self)
         self.females = []
         self.males = []
         self.matingLength = matingLength
-        self.generateFemale(femaleSize)
+        self.generateFemale(femaleSize, fitness)
         # self.generateMale(maleMu, maleSigma, maleSize)
         self.maleMu = maleMu
         self.maleDiv = maleSigma
@@ -36,11 +38,9 @@ class FemaleMatingModel(mesa.Model):
         self.maxGen = generations
         self.mutationSigma = mutationSigma
         self.selection = selection
-        self.file = open("/Users/andrea/Documents/GitHub/Female-Choosing-Project/CSV result files/" + selection + "/" + filename + ".csv", "w+")
+        self.file = open("/Users/andrea/Documents/GitHub/Female-Choosing-Project/CSVResultFiles/" + date + "/" + filename + ".csv", "w+")
         self.writer = csv.writer(self.file)
-        self.writeToFile(["Generation", "Average Fitness", "Stddev Fitness", "Average Threshold", "Stdev Threhold", 
-            "Male's Mu: " + str(self.maleMu), "Male Sigma: " + str(self.maleDiv), "Mating length: " + str(self.matingLength),
-            "Mutation sigma: " + str(self.mutationSigma), "Starting range: " + str(startingRange)])
+        self.writeToFile(["Generation", "Average Fitness", "Stddev Fitness", "Average Threshold", "Stdev Threhold"])
         # for running without mesa
         for x in range(self.maxGen):
             self.step()
@@ -76,7 +76,7 @@ class FemaleMatingModel(mesa.Model):
         parent = self.chooseParent()
         for x in range(len(self.females)):
             index = self.ran.ranInt(len(parent))
-            child = Female(parent[index].getThreshold(), x, self)
+            child = Female(parent[index].getThreshold(), x, self, parent[index].getFitness())
             child.mutate(self.mutationSigma)
             self.females[x] = child
 
@@ -85,9 +85,9 @@ class FemaleMatingModel(mesa.Model):
     """
     def chooseParent(self):
         self.sortFemale()
-        if self.selection == "top50" :
+        if self.selection == 0 :
             return self.top50()
-        elif self.selection == "tournament":
+        elif self.selection == 1:
             return self.tournament()
 
     """
@@ -126,9 +126,9 @@ class FemaleMatingModel(mesa.Model):
     """
     Generate females with random threshold within range
     """
-    def generateFemale(self, size):
+    def generateFemale(self, size, fitness):
         for x in range(size):
-            female = Female(self.ran.threVal(), x, self)
+            female = Female(self.ran.threVal(), x, self, fit = fitness)
             self.females.append(female)
             self.schedule.add(female)
             # generate bitstring

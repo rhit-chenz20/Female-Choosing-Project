@@ -16,7 +16,8 @@ class Female(Agent):
         val, #threshold
         # length of genome
         unique_id,
-        model
+        model,
+        fit
     ):
         """
         Create a new Female.
@@ -25,6 +26,7 @@ class Female(Agent):
         model)
         self.threshold = copy.deepcopy(val)
         self.fitness = 0
+        self.fit = fit
         self.mates = []
 
     # def look(self):
@@ -47,13 +49,19 @@ class Female(Agent):
     """
     def mate(self, male):
         self.mates.append(male)
-        self.calFitness()
+        if(self.fit == 0):
+            self.calFitnessAve()
+        elif (self.fit == 1):
+            self.calFitnessLow()
 
     """
     Calculate the female's fitness by averaging her mated males' fitness
     """
-    def calFitness(self):
+    def calFitnessAve(self):
         self.fitness = sum(self.mates) / len(self.mates)
+
+    def calFitnessLow(self):
+        self.fitness = min(self.mates)
 
     """
     Mutate current threshold
@@ -66,6 +74,9 @@ class Female(Agent):
     
     def getThreshold(self):
         return self.threshold
+
+    def getFitness(self):
+        return self.fit     
     
     def __lt__(self, otherF):
         return self.fitness < otherF.fitness
