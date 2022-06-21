@@ -1,3 +1,6 @@
+from fileinput import filename
+import numpy as np
+import seaborn as sns
 import os
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -16,25 +19,27 @@ class Plot():
     
     def plot(self):
         fileNames = os.listdir(self.inputpath)
-        fileNames = [file for file in fileNames if '.csv' in file]
+        fileNames = [file for file in fileNames if ('.csv' in file) & (self.filename in file)]
         data1 = []
 
         for file in fileNames:
             df = pd.read_csv(self.inputpath + "/" + file, index_col=False)
             data1.append(df)
 
-        # print(data) concat
         data1_cancat = pd.concat(objs=data1)
-        # print(data1_cancat)
         foo = data1_cancat.groupby(level=0).mean()
-        foo.plot(kind='scatter', x='Generation', y='Average Threshold')
-        plt.savefig(self.outputPath + self.date + self.filename + ".png")
-        # plt.show()
-        # data2 = pd.DataFrame(data = data1)
+        # foo.plot(kind='scatter', x='Generation', y='Average Fitness')
+        sns.regplot(x=foo['Generation'],y=foo['Average Fitness'])
+        plt.savefig(self.outputPath + self.date + self.filename + "_aveFit.png")
+        plt.clf()
+        # foo.plot(kind='scatter', x='Generation', y='Average Threshold')
+        sns.regplot(x=foo['Generation'],y=foo['Average Threshold'])
+        plt.savefig(self.outputPath + self.date + self.filename + "_aveThr.png")
+
         
-        # for df in data1:
+        # foo.plot(kind='scatter', x='Generation', y='Stddev Fitness')
+        # plt.savefig(self.outputPath + self.date + self.filename + "_staFit.png")
 
-        #     print(df.get("Average Fitness"))
-
-            # df.plot(kind='scatter', x='Generation', y='Average Fitness')
-            # fig.savefig(self.outputPath + self.date + self.filename)
+        # foo.plot(kind='scatter', x='Generation', y='Stdev Threhold')
+        # plt.savefig(self.outputPath + self.date + self.filename + "_staThr.png")
+        # plt.show()

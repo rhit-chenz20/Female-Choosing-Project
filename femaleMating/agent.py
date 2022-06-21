@@ -75,7 +75,7 @@ class Female(Agent):
     def getThreshold(self):
         return self.threshold
 
-    def getFitness(self):
+    def getFit(self):
         return self.fit     
     
     def __lt__(self, otherF):

@@ -15,7 +15,6 @@ parser.add_argument('range', type=float)
 parser.add_argument('selection', type=int)
 parser.add_argument('fitness', type=int)
 parser.add_argument('filename', type=str)
-parser.add_argument('output', type=str)
 args = parser.parse_args()
 
 model = FemaleMatingModel(

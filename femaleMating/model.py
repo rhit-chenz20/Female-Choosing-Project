@@ -57,9 +57,6 @@ class FemaleMatingModel(mesa.Model):
     def evolve(self):
         for female in self.females:
             for i in range(self.matingLength):
-                # choose a male from a predetermined male group
-                # male = self.males[self.ran.ranInt(len(self.males))]
-
                 # sample a random male from the distribution
                 male = np.random.normal(self.maleMu, self.maleDiv)
                 female.setCurrentMale(male)
@@ -72,11 +69,10 @@ class FemaleMatingModel(mesa.Model):
     
     """
     def reproduce(self):
-
         parent = self.chooseParent()
         for x in range(len(self.females)):
             index = self.ran.ranInt(len(parent))
-            child = Female(parent[index].getThreshold(), x, self, parent[index].getFitness())
+            child = Female(parent[index].getThreshold(), x, self, parent[index].getFit())
             child.mutate(self.mutationSigma)
             self.females[x] = child
 
@@ -135,12 +131,6 @@ class FemaleMatingModel(mesa.Model):
             # random.randbytes(n)
 
     """
-    Generate certain number of males from a normal distribution
-    """
-    # def generateMale(self, mu, sigma, size):
-    #     self.males = np.random.normal(mu, sigma, size)
-    
-    """
     Calculate the fitness' mean of current generation
     """
     def calMeanFit(self):
@@ -195,7 +185,7 @@ class Randomizer():
         self.range = startingRange
 
     def threVal(self):
-        return random.randrange(self.mu - self.range * self.sigma,self.mu + self.range * self.sigma)
+        return random.uniform(self.mu - self.range * self.sigma,self.mu + self.range * self.sigma)
 
     def ranInt(self, size):
         return random.randint(0, size - 1)
