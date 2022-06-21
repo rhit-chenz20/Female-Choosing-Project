@@ -11,7 +11,7 @@ class Plot():
         self,
         filename
         ):
-        self.date = "June20/"
+        self.date = "June21/"
         self.filename = filename
         self.inputpath = "/Users/andrea/Documents/GitHub/Female-Choosing-Project/CSVResultFiles/" + self.date
         self.outputPath = "/Users/andrea/Documents/GitHub/Female-Choosing-Project/ResultPlot/"

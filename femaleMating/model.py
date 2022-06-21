@@ -24,7 +24,7 @@ class FemaleMatingModel(mesa.Model):
         filename
     ):
         super().__init__()
-        date = "June20"
+        date = "June21"
         self.ran = Randomizer(maleMu, maleSigma, startingRange)
         self.schedule = mesa.time.RandomActivation(self)
         self.females = []
@@ -41,9 +41,6 @@ class FemaleMatingModel(mesa.Model):
         self.file = open("/Users/andrea/Documents/GitHub/Female-Choosing-Project/CSVResultFiles/" + date + "/" + filename + ".csv", "w+")
         self.writer = csv.writer(self.file)
         self.writeToFile(["Generation", "Average Fitness", "Stddev Fitness", "Average Threshold", "Stdev Threhold"])
-        # for running without mesa
-        for x in range(self.maxGen):
-            self.step()
 
     def step(self):
         if(self.generation <= self.maxGen):
@@ -54,11 +51,11 @@ class FemaleMatingModel(mesa.Model):
             print("End of simulation")
             self.file.close()
 
-    def evolve(self):
+    def evolve(self, ran):
         for female in self.females:
             for i in range(self.matingLength):
                 # sample a random male from the distribution
-                male = np.random.normal(self.maleMu, self.maleDiv)
+                male = ran.ranMale(self.maleMu, self.maleDiv)
                 female.setCurrentMale(male)
                 # for test without mesa
                 female.step()
@@ -73,7 +70,7 @@ class FemaleMatingModel(mesa.Model):
         for x in range(len(self.females)):
             index = self.ran.ranInt(len(parent))
             child = Female(parent[index].getThreshold(), x, self, parent[index].getFit())
-            child.mutate(self.mutationSigma)
+            child.mutate(self.mutationSigma, self.ran)
             self.females[x] = child
 
     """
@@ -190,3 +187,8 @@ class Randomizer():
     def ranInt(self, size):
         return random.randint(0, size - 1)
 
+    def valmu(self, sigma):
+        return np.random.normal(0,sigma)
+
+    def ranMale(self, mu, sigma):
+        return np.random.normal(mu, sigma)

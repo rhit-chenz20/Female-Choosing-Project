@@ -66,8 +66,8 @@ class Female(Agent):
     """
     Mutate current threshold
     """
-    def mutate(self, sigma):
-        self.threshold += np.random.normal(0,sigma)
+    def mutate(self, sigma, ran):
+        self.threshold += ran.valmu(sigma)
 
     def getFitness(self):
         return self.fitness
@@ -80,9 +80,3 @@ class Female(Agent):
     
     def __lt__(self, otherF):
         return self.fitness < otherF.fitness
-
-
-# class Randomizer():
-#     def val(self):
-#         return 1
-#         # return random.randint(0,100)

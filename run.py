@@ -30,3 +30,6 @@ model = FemaleMatingModel(
     filename = args.filename
 )
 
+# for running without mesa
+for x in range(model.maxGen):
+    model.step()
