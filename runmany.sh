@@ -17,7 +17,7 @@ do
                 #10 trails for each set of parameters
                 for V in {1..10}
                 do
-                    python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py 20 $ML 5 $MS $MuS 500 $SR 0 0 "ml_${ML}_ms_${MS}_mus_${MuS}_sr_${SR}_$V"&
+                    python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py 20 $ML 5 $MS $MuS 500 $SR 0 0 "ml_${ML}_ms_${MS}_mus_${MuS}_sr_${SR}_$V"
                     pids[${count}]=$!
                     echo "running $count"
                     let "count+=1"
@@ -43,7 +43,7 @@ do
             # 3 starting range
             for SR in 0.1 0.0001 0.00001
             do
-                python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py "ml_${ML}_ms_${MS}_mus_${MuS}_sr_${SR}"&
+                python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py "ml_${ML}_ms_${MS}_mus_${MuS}_sr_${SR}"
             done
         done
     done

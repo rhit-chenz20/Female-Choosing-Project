@@ -44,7 +44,7 @@ class FemaleMatingModel(mesa.Model):
 
     def step(self):
         if(self.generation <= self.maxGen):
-            self.evolve()
+            self.evolve(self.ran)
             self.generation += 1
             self.schedule.step()
         else:

@@ -3,19 +3,27 @@ from femaleMating.agent import Female
 from femaleMating.model import FemaleMatingModel
 
 class Randomizer():
+    def __init__(
+        self,
+    ):
+        self.mu = 1
+        self.thre = 10
+        self.male = 1
+        self.int = 1
 
     def threVal(self):
-        return 1
+        return self.thre
 
     def ranInt(self, size):
-        return 1
+        return self.int
 
     def valmu(self, sigma):
-        return 1
+        return self.mu
 
     def ranMale(self, mu, sigma):
-        return 1
-
+        return self.male
+    def set_mu(self, newnum):
+        self.mu = newnum
 
 class TestStringMethods(unittest.TestCase):
 
@@ -43,6 +51,9 @@ class TestStringMethods(unittest.TestCase):
     def test_mutate(self):
         self.female.mutate(1,self.ran)
         self.assertEqual(self.female.getThreshold(), 11)
+        self.ran.set_mu(-1)
+        self.female.mutate(1,self.ran)
+        self.assertEqual(self.female.getThreshold(), 10)
 
     # def test_isupper(self):
     #     self.assertTrue('FOO'.isupper())
