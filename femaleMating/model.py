@@ -24,7 +24,7 @@ class FemaleMatingModel(mesa.Model):
         filename
     ):
         super().__init__()
-        date = "June21"
+        date = "June22"
         self.ran = Randomizer(maleMu, maleSigma, startingRange)
         self.schedule = mesa.time.RandomActivation(self)
         self.females = []
