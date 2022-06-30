@@ -14,7 +14,7 @@ do
             #10 trails for each set of parameters
             for V in {1..10}
             do
-                python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml $ML -ms $MS -mus 0.1 -fsigma $SR -fmu 5 -fit 1 -fn "ml_${ML}_ms_${MS}_mus_${MuS}_fsigma_${SR}_$V"
+                python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml $ML -ms $MS -fsigma $SR -fmu 5 -fit 1 -fn "ml_${ML}_ms_${MS}_mus_${MuS}_fsigma_${SR}_$V"
                 # pids[${count}]=$!
                 echo "running $count"
                 let "count+=1"

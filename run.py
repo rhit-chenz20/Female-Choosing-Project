@@ -8,7 +8,7 @@ parser = argparse.ArgumentParser(description='Start female mating simulation')
 parser.add_argument('-fs', '--femaleSize', type=int, default=20, required=False)
 parser.add_argument('-ml', '--matingLength', type=int)
 parser.add_argument('-ms', '--maleSigma', type=float)
-parser.add_argument('-mus', '--mutationSigma', type=float)
+parser.add_argument('-mul', '--mutationLamda', type=int, default=1, required=False)
 parser.add_argument('-max', '--maxGen', type=int, default=100, required=False)
 parser.add_argument('-fsigma', '--femaleSigma', type=float)
 parser.add_argument('-fmu', '--femaleMu', type=float)
@@ -25,7 +25,7 @@ model = FemaleMatingModel(
     femaleSize = args.femaleSize,
     matingLength = args.matingLength,
     maleSigma = args.maleSigma,
-    mutationSigma = args.mutationSigma,
+    mutationSigma = args.mutationLamda,
     generations = args.maxGen,
     femaleSigma =  args.femaleSigma,
     femaleMu = args.femaleMu,

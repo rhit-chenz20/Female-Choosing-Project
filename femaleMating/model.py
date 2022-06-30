@@ -43,8 +43,6 @@ class FemaleMatingModel():
         self.maxGen = generations
         self.mutationSigma = mutationSigma
         self.selection = selection
-       
-        
         self.file = open("CSVResultFiles/" + date + filename + ".csv", "w+")
         self.writer = csv.writer(self.file)
         self.writeToFile(["Generation", "Average Fitness", "Stddev Fitness", "Average Threshold", "Stdev Threhold"])
@@ -78,10 +76,11 @@ class FemaleMatingModel():
             index = self.ran.ranInt(len(parent))
             if(isinstance(parent[index], FemaleThreshold)):
                 child = FemaleThreshold(parent[index].threshold, parent[index].fit)
+                child.mutate(0.1, self.ran)
             elif(isinstance(parent[index], FemaleGenome)):
-                child = FemaleGenome(parent[index].genome, parent[index].fit, parent[index].memoryLength,
+                child = FemaleGenome(parent[index].genome, parent[index].fit, len(parent[index].memory),
                 parent[index].flatcost, parent[index].fitbase)
-            child.mutate(self.mutationSigma, self.ran)
+                child.mutate(self.mutationSigma, self.ran)
             self.females[x] = child
 
     """
@@ -182,6 +181,3 @@ class Randomizer():
 
     def poisson(self, lam):
         return np.random.poisson(lam)
-
-    # def ranSample(self, list, size):
-    #     return random.sample(list, size)
