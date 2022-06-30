@@ -4,9 +4,9 @@ import random
 import csv
 import numpy as np
 
-from .agent import Female
+from .agent import FemaleGenome, FemaleThreshold
 
-class FemaleMatingModel(mesa.Model):
+class FemaleMatingModel():
     """
 
     """
@@ -14,31 +14,38 @@ class FemaleMatingModel(mesa.Model):
         self,
         femaleSize,
         matingLength,
-        maleMu,
         maleSigma,
         mutationSigma,
         generations,
-        startingRange,
+        femaleSigma,
+        femaleMu,
         selection,
         fitness,
-        filename
+        filename,
+        femaleType,
+        memoryLength,
+        flatcost,
+        fitbase
     ):
         super().__init__()
-        date = "June22"
-        self.ran = Randomizer(maleMu, maleSigma, startingRange)
-        self.schedule = mesa.time.RandomActivation(self)
+        date = "June28/"
+        self.ran = Randomizer()
+        # self.schedule = mesa.time.RandomActivation(self)
         self.females = []
         self.males = []
         self.matingLength = matingLength
-        self.generateFemale(femaleSize, fitness)
-        # self.generateMale(maleMu, maleSigma, maleSize)
-        self.maleMu = maleMu
+        self.flatcost = flatcost
+        self.fitbase = fitbase 
+        self.memoryLength = memoryLength
+        self.generateFemale(femaleSize, fitness, femaleType, self.ran, femaleSigma, femaleMu)
         self.maleDiv = maleSigma
         self.generation = 0
         self.maxGen = generations
         self.mutationSigma = mutationSigma
         self.selection = selection
-        self.file = open("/Users/andrea/Documents/GitHub/Female-Choosing-Project/CSVResultFiles/" + date + "/" + filename + ".csv", "w+")
+       
+        
+        self.file = open("CSVResultFiles/" + date + filename + ".csv", "w+")
         self.writer = csv.writer(self.file)
         self.writeToFile(["Generation", "Average Fitness", "Stddev Fitness", "Average Threshold", "Stdev Threhold"])
 
@@ -46,7 +53,7 @@ class FemaleMatingModel(mesa.Model):
         if(self.generation <= self.maxGen):
             self.evolve(self.ran)
             self.generation += 1
-            self.schedule.step()
+            # self.schedule.step()
         else:
             print("End of simulation")
             self.file.close()
@@ -55,11 +62,11 @@ class FemaleMatingModel(mesa.Model):
         for female in self.females:
             for i in range(self.matingLength):
                 # sample a random male from the distribution
-                male = ran.ranMale(self.maleMu, self.maleDiv)
+                male = ran.ranMale(self.maleDiv)
                 female.setCurrentMale(male)
                 # for test without mesa
                 female.step()
-        self.writeToFile([self.generation, self.calMeanFit(), self.calDivFit(), self.calMeanThres(), self.calDivThres()])         
+        self.writeToFile(self.calData())
         self.reproduce()
 
     """
@@ -69,7 +76,11 @@ class FemaleMatingModel(mesa.Model):
         parent = self.chooseParent()
         for x in range(len(self.females)):
             index = self.ran.ranInt(len(parent))
-            child = Female(parent[index].getThreshold(), x, self, parent[index].getFit())
+            if(isinstance(parent[index], FemaleThreshold)):
+                child = FemaleThreshold(parent[index].threshold, parent[index].fit)
+            elif(isinstance(parent[index], FemaleGenome)):
+                child = FemaleGenome(parent[index].genome, parent[index].fit, parent[index].memoryLength,
+                parent[index].flatcost, parent[index].fitbase)
             child.mutate(self.mutationSigma, self.ran)
             self.females[x] = child
 
@@ -97,14 +108,12 @@ class FemaleMatingModel(mesa.Model):
     """
     def tournament(self):
         parent = []
-        # Select two random females from the population
-        # Choose the one with higher fitness
         for x in range(int(len(self.females)/2)):
             index1 = self.ran.ranInt(len(self.females))
             index2 = self.ran.ranInt(len(self.females))
             if(index1 == index2):
                 index2 = self.ran.ranInt(len(self.females))
-            if(self.females[index1].getFitness() >= self.females[index2].getFitness()):
+            if(self.females[index1].fitness >= self.females[index2].fitness):
                 parent.append(self.females[index1])
             else:
                 parent.append(self.females[index2])
@@ -119,49 +128,37 @@ class FemaleMatingModel(mesa.Model):
     """
     Generate females with random threshold within range
     """
-    def generateFemale(self, size, fitness):
-        for x in range(size):
-            female = Female(self.ran.threVal(), x, self, fit = fitness)
-            self.females.append(female)
-            self.schedule.add(female)
-            # generate bitstring
-            # random.randbytes(n)
+    def generateFemale(self, size, fitness, type, ran, femaleSigma, femaleMu):
+        if(type == 1):
+            for x in range(size):
+                genome = []
+                for y in range(self.matingLength):
+                    genome.append(ran.ranInt(2))
+                female = FemaleGenome(genome, fit = fitness, memoryLength= self.memoryLength, flatcost= self.flatcost, fitbase=self.fitbase)
+                self.females.append(female)
+        elif (type == 0):
+            for x in range(size):
+                female = FemaleThreshold(self.ran.threVal(femaleSigma, femaleMu), fit = fitness, fitbase = self.fitbase)
+                self.females.append(female)
+            # self.schedule.add(female)
 
-    """
-    Calculate the fitness' mean of current generation
-    """
-    def calMeanFit(self):
-        total = 0
-        for x in range(len(self.females)):
-            total += self.females[x].getFitness()
-        return total / len(self.females)
-
-    """
-    Calculate the fitness' standard deviation of current generation
-    """
-    def calDivFit(self):
+    def calData(self):
+        result = [self.generation]
         fitnesses = []
-        for x in range(len(self.females)):
-            fitnesses.append(self.females[x].getFitness())
-        return statistics.pstdev(fitnesses)
-
-    """
-    Calculate the thresholds' mean of current generation
-    """
-    def calMeanThres(self):
-        total = 0
-        for x in range(len(self.females)):
-            total += self.females[x].getThreshold()
-        return total / len(self.females)
-
-    """
-    Calculate the thresholds' standard deviation of current generation
-    """
-    def calDivThres(self):
         thresholds = []
         for x in range(len(self.females)):
-            thresholds.append(self.females[x].getThreshold())
-        return statistics.pstdev(thresholds)
+            fitnesses.append(self.females[x].fitness)
+            thresholds.append(self.females[x].threshold)
+        
+        # Average fitness
+        result.append(sum(fitnesses) / len(self.females))
+        # Standard deviation of fitness
+        result.append(statistics.pstdev(fitnesses))
+        # Average threshold
+        result.append(sum(thresholds) / len(self.females))
+        # Standard deviation of threshold
+        result.append(statistics.pstdev(thresholds))
+        return result
 
     """
     Write a row into csv file
@@ -170,19 +167,9 @@ class FemaleMatingModel(mesa.Model):
         self.writer.writerow(row)
 
 class Randomizer():
-    def __init__(
-        self,
-        maleMu,
-        maleSigma,
-        startingRange
-    ):
-        super().__init__()
-        self.mu = maleMu
-        self.sigma = maleSigma
-        self.range = startingRange
 
-    def threVal(self):
-        return random.uniform(self.mu - self.range * self.sigma,self.mu + self.range * self.sigma)
+    def threVal(self, sigma, mu):
+        return np.random.normal(mu, sigma)
 
     def ranInt(self, size):
         return random.randint(0, size - 1)
@@ -190,5 +177,11 @@ class Randomizer():
     def valmu(self, sigma):
         return np.random.normal(0,sigma)
 
-    def ranMale(self, mu, sigma):
-        return np.random.normal(mu, sigma)
+    def ranMale(self, sigma):
+        return np.random.normal(5, sigma)
+
+    def poisson(self, lam):
+        return np.random.poisson(lam)
+
+    # def ranSample(self, list, size):
+    #     return random.sample(list, size)

@@ -9,76 +9,40 @@ import matplotlib.pyplot as plt
 class Plot():
     def __init__(
         self,
-        filename
+        filenames,
+        output
         ):
-        self.date = "June22/"
-        self.filename = filename
-        self.inputpath = "/Users/andrea/Documents/GitHub/Female-Choosing-Project/CSVResultFiles/" + self.date
-        self.outputPath = "/Users/andrea/Documents/GitHub/Female-Choosing-Project/ResultPlot/"
+        date = "June28/"
+        self.names = ['Average Fitness', "Stddev Fitness", "Average Threshold", "Stdev Threhold"]
+        self.labels = ['Average Fitness', 'Standard Deviation Fitness', 'Average Threshold', 'Standard Deviation Threshold']
+        self.fignames = ['ave_fit', 'sta_fit', 'ave_the', 'sta_the']
+        self.filenames = filenames
+        self.output = 'ResultPlot/' + date + output
+        
         self.plot()
     
     def plot(self):
-        fileNames = os.listdir(self.inputpath)
-        fileNames = [file for file in fileNames if ('.csv' in file) & (self.filename in file)]
         data1 = []
 
-        for file in fileNames:
-            df = pd.read_csv(self.inputpath + "/" + file, index_col=False)
+        for file in self.filenames:
+            df = pd.read_csv(file, index_col=False)
             data1.append(df)
-            # df.plot(kind='scatter', x='Generation', y='Stddev Fitness')
-        # plt.show()
-
-        color = iter(plt.cm.rainbow(np.linspace(0, 1, len(data1))))
-        fig, ax = plt.subplots()  # creates one figure with one axes
-        for x in range(len(data1)):  # Looping over the GroupBy objects
-            c=next(color)
-            data1[x].plot(x='Generation', y='Average Fitness', ax=ax, kind='scatter', label=x, c=c)
 
         data1_cancat = pd.concat(objs=data1)
         foo = data1_cancat.groupby(level=0).mean()
 
-        sns.regplot(x=foo['Generation'],y=foo['Average Fitness'], lowess=True, scatter=False)
-        plt.savefig(self.outputPath + self.date + self.filename + "_aveFit.png")
-        plt.clf()
+        self.plotFig(data1, foo)
 
-        color = iter(plt.cm.rainbow(np.linspace(0, 1, len(data1))))
-        fig, ax = plt.subplots()  # creates one figure with one axes
-        for x in range(len(data1)):  # Looping over the GroupBy objects
-            c=next(color)
-            data1[x].plot(x='Generation', y='Stddev Fitness', ax=ax, kind='scatter', label=x, c=c)
+    def plotFig(self, data1, foo):
+        for y in range(len(self.names)):
+            color = iter(plt.cm.rainbow(np.linspace(0, 1, len(data1))))
+            fig, ax = plt.subplots()
+            
+            for x in range(len(data1)):
+                c=next(color)
+                data1[x].plot(x='Generation', y=self.names[y], ax=ax, kind='scatter', label=x, c=c)
         
-        sns.regplot(x=foo['Generation'],y=foo['Stddev Fitness'], lowess=True, scatter=False)
-        plt.savefig(self.outputPath + self.date + self.filename + "_staFit.png")
-        plt.clf()
-
-
-        color = iter(plt.cm.rainbow(np.linspace(0, 1, len(data1))))
-        fig, ax = plt.subplots()  # creates one figure with one axes
-        for x in range(len(data1)):  # Looping over the GroupBy objects
-            c=next(color)
-            data1[x].plot(x='Generation', y='Average Threshold', ax=ax, kind='scatter', label=x, c=c)
-        
-        sns.regplot(x=foo['Generation'],y=foo['Average Threshold'], lowess=True, scatter=False)
-        plt.savefig(self.outputPath + self.date + self.filename + "_aveThr.png")
-        plt.clf()
-
-        color = iter(plt.cm.rainbow(np.linspace(0, 1, len(data1))))
-        fig, ax = plt.subplots()  # creates one figure with one axes
-        for x in range(len(data1)):  # Looping over the GroupBy objects
-            c=next(color)
-            data1[x].plot(x='Generation', y='Stdev Threhold', ax=ax, kind='scatter', label=x, c=c)
-        
-        sns.regplot(x=foo['Generation'],y=foo['Stdev Threhold'], lowess=True, scatter=False)
-        plt.savefig(self.outputPath + self.date + self.filename + "_staThr.png")
-        # plt.clf()
-        # foo.plot(kind='scatter', x='Generation', y='Average Threshold')
-        # sns.regplot(x=foo['Generation'],y=foo['Average Threshold'])
-        # plt.savefig(self.outputPath + self.date + self.filename + "_aveThr.png")
-
-        
-        # foo.plot(kind='scatter', x='Generation', y='Stddev Fitness')
-        # plt.savefig(self.outputPath + self.date + self.filename + "_staFit.png")
-
-        # foo.plot(kind='scatter', x='Generation', y='Stdev Threhold')
-        # plt.savefig(self.outputPath + self.date + self.filename + "_staThr.png")
-        # plt.show()
+            sns.regplot(x=foo['Generation'],y=foo[self.names[y]], lowess=True, scatter=False)
+            ax.set(xlabel='Generation', ylabel=self.labels[y])
+            plt.savefig(self.output + "_" + self.fignames[y] + ".png")
+            plt.clf()

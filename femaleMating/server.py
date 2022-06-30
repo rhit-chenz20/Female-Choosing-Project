@@ -1,7 +1,7 @@
 import mesa
 
 from .model import FemaleMatingModel
-from .agent import Female
+from .agent import FemaleThreshold
 
 
 COP_COLOR = "#000000"

@@ -5,29 +5,37 @@ import argparse
 from femaleMating.model import FemaleMatingModel
 
 parser = argparse.ArgumentParser(description='Start female mating simulation')
-parser.add_argument('fSize', type=int)
-parser.add_argument('mLength', type=int)
-parser.add_argument('mMu', type=float)
-parser.add_argument('mSigma', type=float)
-parser.add_argument('muSigma', type=float)
-parser.add_argument('maxGen', type=int)
-parser.add_argument('range', type=float)
-parser.add_argument('selection', type=int)
-parser.add_argument('fitness', type=int)
-parser.add_argument('filename', type=str)
+parser.add_argument('-fs', '--femaleSize', type=int, default=20, required=False)
+parser.add_argument('-ml', '--matingLength', type=int)
+parser.add_argument('-ms', '--maleSigma', type=float)
+parser.add_argument('-mus', '--mutationSigma', type=float)
+parser.add_argument('-max', '--maxGen', type=int, default=100, required=False)
+parser.add_argument('-fsigma', '--femaleSigma', type=float)
+parser.add_argument('-fmu', '--femaleMu', type=float)
+parser.add_argument('-sel', '--selection', type=int, default=0, required=False)
+parser.add_argument('-fit', '--fitnessFunction', type=int, default=0, required=False)
+parser.add_argument('-fn', '--filename', type=str)
+parser.add_argument('-ft', '--femaleType', type = int, default=0, required=False)
+parser.add_argument('-memoL', '--memoryLength', type = int, default=0, required=False)
+parser.add_argument('-c', '--flatCost', type = float, default=0, required=False)
+parser.add_argument('-base', '--fitbase', type = float, default=0.5, required=False)
 args = parser.parse_args()
 
 model = FemaleMatingModel(
-    femaleSize = args.fSize,
-    matingLength = args.mLength,
-    maleMu = args.mMu,
-    maleSigma = args.mSigma,
-    mutationSigma = args.muSigma,
+    femaleSize = args.femaleSize,
+    matingLength = args.matingLength,
+    maleSigma = args.maleSigma,
+    mutationSigma = args.mutationSigma,
     generations = args.maxGen,
-    startingRange = args.range,
+    femaleSigma =  args.femaleSigma,
+    femaleMu = args.femaleMu,
     selection = args.selection,
-    fitness=args.fitness,
-    filename = args.filename
+    fitness=args.fitnessFunction,
+    filename = args.filename,
+    femaleType = args.femaleType,
+    memoryLength= args.memoryLength,
+    flatcost=args.flatCost,
+    fitbase = args.fitbase
 )
 
 # for running without mesa
