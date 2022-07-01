@@ -28,7 +28,7 @@ class FemaleMatingModel():
         fitbase
     ):
         super().__init__()
-        date = "June28/"
+        date = "June29/"
         self.ran = Randomizer()
         # self.schedule = mesa.time.RandomActivation(self)
         self.females = []
@@ -43,9 +43,15 @@ class FemaleMatingModel():
         self.maxGen = generations
         self.mutationSigma = mutationSigma
         self.selection = selection
-        self.file = open("CSVResultFiles/" + date + filename + ".csv", "w+")
-        self.writer = csv.writer(self.file)
-        self.writeToFile(["Generation", "Average Fitness", "Stddev Fitness", "Average Threshold", "Stdev Threhold"])
+        self.fitfile = open("CSVResultFiles/" + date + filename + ".csv", "w+")
+        self.fitwriter = csv.writer(self.fitfile)
+        self.genefile = open("CSVResultFiles/" + date + 'geno_' +filename + ".csv", "w+")
+        self.genowriter = csv.writer(self.genefile)
+        self.writeToFile(self.fitwriter,["Generation", "Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"])
+        title = ['Generation']
+        for x in range(matingLength):
+            title.append("mate_"+str(x+1)+"_look")
+        self.writeToFile(self.genowriter, title)
 
     def step(self):
         if(self.generation <= self.maxGen):
@@ -54,7 +60,8 @@ class FemaleMatingModel():
             # self.schedule.step()
         else:
             print("End of simulation")
-            self.file.close()
+            self.fitfile.close()
+            self.genefile.close()
 
     def evolve(self, ran):
         for female in self.females:
@@ -64,7 +71,8 @@ class FemaleMatingModel():
                 female.setCurrentMale(male)
                 # for test without mesa
                 female.step()
-        self.writeToFile(self.calData())
+        self.writeToFile(self.fitwriter, self.calData())
+        self.writeToFile(self.genowriter, self.colData())
         self.reproduce()
 
     """
@@ -88,6 +96,7 @@ class FemaleMatingModel():
     """
     def chooseParent(self):
         self.sortFemale()
+        # print(self.females[0].genome)
         if self.selection == 0 :
             return self.top50()
         elif self.selection == 1:
@@ -141,6 +150,18 @@ class FemaleMatingModel():
                 self.females.append(female)
             # self.schedule.add(female)
 
+    def colData(self):
+        result = [self.generation]
+        for x in range(self.matingLength):
+            # all1 = 0
+            all0 = 0
+            for female in self.females:
+                if(female.genome[x] == 0):
+                    all0+=1
+
+            result.append(all0/len(self.females))
+        return result
+
     def calData(self):
         result = [self.generation]
         fitnesses = []
@@ -154,7 +175,7 @@ class FemaleMatingModel():
         # Standard deviation of fitness
         result.append(statistics.pstdev(fitnesses))
         # Average threshold
-        result.append(sum(thresholds) / len(self.females))
+        result.append(sum(thresholds) / len(self.females)) 
         # Standard deviation of threshold
         result.append(statistics.pstdev(thresholds))
         return result
@@ -162,8 +183,8 @@ class FemaleMatingModel():
     """
     Write a row into csv file
     """
-    def writeToFile(self, row):
-        self.writer.writerow(row)
+    def writeToFile(self,writer, row):
+        writer.writerow(row)
 
 class Randomizer():
 

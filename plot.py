@@ -3,10 +3,12 @@ from femaleMating.plot import Plot
 
 parser = argparse.ArgumentParser(description='Plot CSV result')
 parser.add_argument('-out', '--outputFilename', type=str)
-parser.add_argument('-in', '--filenames', type=str, nargs='*')
+parser.add_argument('-inf', '--fitfilenames', type=str, nargs='*')
+parser.add_argument('-ing', '--gefilenames', type=str, nargs='*')
 args = parser.parse_args()
 
 model = Plot(
-    filenames = args.filenames,
+    fitfilenames = args.fitfilenames,
+    genofilenames = args.gefilenames,
     output = args.outputFilename
 )

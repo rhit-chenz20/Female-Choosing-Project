@@ -1,4 +1,6 @@
-import numpy as np
 
-for x in range(10): 
-    print(np.random.poisson(2))
+import datetime 
+
+
+date = datetime.date.today().strftime('%Y%m%d') + "/"
+print(date)

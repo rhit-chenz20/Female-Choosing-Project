@@ -126,16 +126,17 @@ class FemaleGenome(Female):
         self.genome = copy.deepcopy(genome)
         self.memory = [None] * memoryLength
         self.threshold = 0
+        self.geneindex = 0
         self.flatcost = flatcost
 
     def step(self):
         self.memorize()
         self.calThreshold()
-        for x in range(len(self.genome)):
-            if(self.genome[x] == 1):
-                self.mate()
+        if(self.genome[self.geneindex] == 1):
+            self.mate()
         self.calFitness()
         self.adjustCost()
+        self.geneindex+=1
 
     def memorize(self):
         notfull = True
@@ -153,14 +154,16 @@ class FemaleGenome(Female):
     def mate(self):
         if(self.currentMale >= self.threshold):
             self.mates.append(self.currentMale)
-            self.adjustCost()
             return True
         else:
             return False
     
     def calThreshold(self):
         filtered = list(filter(lambda male: male != None, self.memory))
-        self.threshold = sum(filtered) / len(filtered)
+        if(len(filtered) != 0):
+            self.threshold = sum(filtered) / len(filtered)
+        else:
+            self.threshold = 0
 
     def mutate(self, lamda, ran):
         size = ran.poisson(lamda)
