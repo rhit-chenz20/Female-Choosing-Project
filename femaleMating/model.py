@@ -2,6 +2,7 @@ import mesa
 import statistics
 import random
 import csv
+import os
 import numpy as np
 
 from .agent import FemaleGenome, FemaleThreshold
@@ -28,7 +29,9 @@ class FemaleMatingModel():
         fitbase
     ):
         super().__init__()
-        date = "June29/"
+        date = "July6/"
+        if not os.path.exists("CSVResultFiles/" + date):
+            os.makedirs("CSVResultFiles/" + date)
         self.ran = Randomizer()
         # self.schedule = mesa.time.RandomActivation(self)
         self.females = []
@@ -41,16 +44,22 @@ class FemaleMatingModel():
         self.maleDiv = maleSigma
         self.generation = 0
         self.maxGen = generations
-        self.mutationSigma = mutationSigma
+        self.mutationSigma = mutationSigma * matingLength
         self.selection = selection
         self.fitfile = open("CSVResultFiles/" + date + filename + ".csv", "w+")
         self.fitwriter = csv.writer(self.fitfile)
         self.genefile = open("CSVResultFiles/" + date + 'geno_' +filename + ".csv", "w+")
         self.genowriter = csv.writer(self.genefile)
-        self.writeToFile(self.fitwriter,["Generation", "Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"])
+        # self.writeToFile(self.fitwriter,["Generation", "Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"])
+        self.writeToFile(self.fitwriter,["Generation", "Ave_Fitness", "All_Mate"])
         title = ['Generation']
+        genotitle =''
+        genotitle+= 'best'
         for x in range(matingLength):
-            title.append("mate_"+str(x+1)+"_look")
+            title.append(genotitle + "_mate_"+str(x+1))
+        genotitle = 'worst'
+        for x in range(matingLength):
+            title.append(genotitle + "_mate_"+str(x+1))
         self.writeToFile(self.genowriter, title)
 
     def step(self):
@@ -71,8 +80,9 @@ class FemaleMatingModel():
                 female.setCurrentMale(male)
                 # for test without mesa
                 female.step()
-        self.writeToFile(self.fitwriter, self.calData())
-        self.writeToFile(self.genowriter, self.colData())
+        # self.writeToFile(self.fitwriter, self.calDataThre())
+        self.writeToFile(self.fitwriter, self.calDataNoThre())
+        # self.writeToFile(self.genowriter, self.colData())
         self.reproduce()
 
     """
@@ -132,6 +142,7 @@ class FemaleMatingModel():
     """
     def sortFemale(self):
         self.females.sort(reverse=True)
+        self.writeToFile(self.genowriter, self.bestWorstIndi())
 
     """
     Generate females with random threshold within range
@@ -153,16 +164,25 @@ class FemaleMatingModel():
     def colData(self):
         result = [self.generation]
         for x in range(self.matingLength):
-            # all1 = 0
-            all0 = 0
+            all1 = 0
+            # all0 = 0
             for female in self.females:
-                if(female.genome[x] == 0):
-                    all0+=1
-
-            result.append(all0/len(self.females))
+                if(female.genome[x] == 1):
+                    all1+=1
+            result.append(all1/len(self.females))
         return result
 
-    def calData(self):
+    def bestWorstIndi(self):
+        result = [self.generation]
+        best = self.females[0]
+        worst = self.females[len(self.females) - 1]
+        for x in range(len(best.genome)):
+            result.append(best.genome[x])
+        for y in range(len(worst.genome)):
+            result.append(worst.genome[y])
+        return result
+
+    def calDataThre(self):
         result = [self.generation]
         fitnesses = []
         thresholds = []
@@ -178,6 +198,23 @@ class FemaleMatingModel():
         result.append(sum(thresholds) / len(self.females)) 
         # Standard deviation of threshold
         result.append(statistics.pstdev(thresholds))
+        return result
+
+    def calDataNoThre(self):
+        result = [self.generation]
+        fitnesses = []
+        all1 = 0
+        for female in self.females:
+            fitnesses.append(female.fitness)
+            for x in range(self.matingLength):
+                if female.genome[x] == 1:
+                    all1+=1
+        # Average fitness
+        result.append(sum(fitnesses) / len(self.females))
+        # Standard deviation of fitness
+        # result.append(statistics.pstdev(fitnesses))
+        # All mate
+        result.append(all1)
         return result
 
     """
