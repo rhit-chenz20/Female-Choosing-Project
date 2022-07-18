@@ -1,24 +1,42 @@
-# # !/bin/bash
-# count = 0
+# !/bin/bash
+declare date="July18"
 # # maleMu = 5
-# # 3 female mu
-# for FM in -5 5 15
+# # 2 fitness function (0-average, 1-lowest)
+# for FIT in 0 
+# #1
 # do
-#     # 3 different male sigma
-#     for MS in 1 10 100
+#     # 2 selection percentage
+#     for PER in 0.5
+#     #0.1
 #     do
-#         for FSIGMA in 1 10 100
-#         do
-#             # 3 female memory
-#             for ME in 0 5 10
+#         # 3 different male sigma
+#         for MS in 1 
+#         #10 50
+#         do                    
+#             # 3 female mu
+#             for FM in 5
+#             #-5 15
 #             do
-#                 #10 trails for each set of parameters
-#                 for V in {1..10}
+
+#                 for FSIGMA in 1 
+#                 #10 50
 #                 do
-#                     python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 20 -ms $MS -fsigma $FSIGMA -fmu $FM -fit 1 -fn "ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_$V" -ft 1 -memol ${ME}
-#                     # pids[${count}]=$!
-#                     let "count+=1"
-#                     echo "running $count"
+#                     # 3 female memory
+#                     for ME in 0 5 10 20 50
+#                     do
+
+#                         for ML in 1 5 10 20 50
+#                         do
+#                             #10 trails for each set of parameters
+#                             for V in {1..10}
+#                             do
+#                                 python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml ${ML} -ms ${MS} -fsigma $FSIGMA -fmu $FM -fit 1 -fn "ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_selper_${PER}_fit_${FIT}_$V" -ft 1 -memol ${ME} -per ${PER} -fit ${FIT}
+#                                 # pids[${count}]=$!
+#                                 let "count+=1"
+#                                 echo "running $count"
+#                             done
+#                         done
+#                     done
 #                 done
 #             done
 #         done
@@ -32,57 +50,99 @@
 
 # c=0
 
-# python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July6/ms_1_fsigma_1_fmu_*_me_0_*.csv -out ms_1_fsigma_1_fmu_${FM}_me_${ME} -ing CSVResultFiles/July6/geno_ms_${MS}_fsigma_${MS}_fmu_${FM}_me_${ME}_*.csv
+# # plot mating length
+# # python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July8/ms_1_fsigma_1_fmu_*_me_0_*.csv -out ms_1_fsigma_1_fmu_${FM}_me_${ME} -ing CSVResultFiles/July8/geno_ms_${MS}_fsigma_${MS}_fmu_${FM}_me_${ME}_*.csv
 
-
-
-
-# 4 different mating length, aka how many chances a female gets for mating
-# for FM in -5 5 15
+# # maleMu = 5
+# # mating length
+# for FIT in 0 
+# #1
 # do
-#     # 3 different male sigma
-#     for MS in 1 10 100
+#     # 2 selection percentage
+#     for PER in 0.5
+#     #0.1
 #     do
-#         # 3 female memory
-#         for ME in 0 5 10
-#         do
-#             python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July6/ms_${MS}_fsigma_${MS}_fmu_${FM}_me_${ME}_*.csv -out ms_${MS}_fsigma_${MS}_fmu_${FM}_me_${ME} -ing CSVResultFiles/July6/geno_ms_${MS}_fsigma_${MS}_fmu_${FM}_me_${ME}_*.csv
-#             let "c+=1"
-#             echo "plotting $c"
-#         done
-#     done
-# done
-
-# echo "finished"
-
-#  -----------------------------------test trial----------------------------
-
-# 3 female memory
-# count = 1
-# for ME in 0
-# do
-#     for MS in 1 5
-#     do
-#         for FSIGMA in 1 5
-#         do
-#             #10 trails for each set of parameters
-#             for V in {1..10}
+#         # 3 different male sigma
+#         for MS in 1 
+#         #10 50
+#         do                    
+#             # 3 female mu
+#             for FM in 5 
+#             #-5 15
 #             do
-#                 python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 10 -ms $MS -fsigma $FSIGMA -fmu 5 -fn "me_${ME}_ms_${MS}_fsigma_${FSIGMA}_${V}_" -ft 1 -memol ${ME}
-#                 # pids[${count}]=$!
-#                 echo "running $count"
-#                 let "count+=1"
+
+#                 for FSIGMA in 1 
+#                 #10 50
+#                 do
+#                     # 3 female memory
+#                     for ME in 0 5 
+#                     #10 20 50
+#                     do
+
+#                         for ML in 1 5 10 20 50
+#                         do
+#                             # fitness function
+#                             python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July8/ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_selper_${PER}_fit_*_*.csv -outfolder fitness_function -out ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_selper_${PER} -ing CSVResultFiles/July8/geno_ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_selper_${PER}_fit_*_*.csv
+#                             let "c+=1"
+#                             echo "ploting $c"
+#                             # selection percent
+#                             python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July8/ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_selper_*_fit_${FIT}_*.csv -outfolder selection_percent -out ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_fit_${FIT} -ing CSVResultFiles/July8/geno_ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_selper_*_fit_${FIT}_*.csv
+#                             let "c+=1"
+#                             echo "ploting $c"
+#                             # memory length
+#                             python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July8/ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_me_*_selper_${PER}_fit_${FIT}_*.csv -outfolder memory_length -out ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_selper_${PER}_fit_${FIT} -ing CSVResultFiles/July8/geno_ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_${FM}_me_*_selper_${PER}_fit_${FIT}_*.csv
+#                             let "c+=1"
+#                             echo "ploting $c"
+#                             # female sigma
+#                             python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July8/ml_${ML}_ms_${MS}_fsigma_*_fmu_${FM}_me_${ME}_selper_${PER}_fit_${FIT}_*.csv -outfolder female_sigma -out ml_${ML}_ms_${MS}_fmu_${FM}_me_${ME}_selper_${PER}_fit_${FIT} -ing CSVResultFiles/July8/geno_ml_${ML}_ms_${MS}_fsigma_*_fmu_${FM}_me_${ME}_selper_${PER}_fit_${FIT}_*.csv
+#                             let "c+=1"
+#                             echo "ploting $c"
+#                             # male sigma
+#                             python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July8/ml_${ML}_ms_*_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_selper_${PER}_fit_${FIT}_*.csv -outfolder male_sigma -out ml_${ML}_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_selper_${PER}_fit_${FIT} -ing CSVResultFiles/July8/geno_ml_${ML}_ms_*_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_selper_${PER}_fit_${FIT}_*.csv
+#                             let "c+=1"
+#                             echo "ploting $c"
+#                             # female mu
+#                             python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July8/ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_fmu_*_me_${ME}_selper_${PER}_fit_${FIT}_*.csv -outfolder female_mu -out ml_${ML}_ms_${MS}_fsigma_${FSIGMA}_me_${ME}_selper_${PER}_fit_${FIT} -ing CSVResultFiles/July8/geno_ml_${ML}_ms_*_fsigma_${FSIGMA}_fmu_${FM}_me_${ME}_selper_${PER}_fit_${FIT}_*.csv
+#                             let "c+=1"
+#                             echo "ploting $c"
+#                         done
+#                     done
+#                 done
 #             done
 #         done
 #     done
 # done
 
-# c=1
-# for MS in 1 5
-# do
-#     python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July6/me_0_ms_${MS}_fsigma_1_*.csv -out me_0_ms_${MS}_fsigma_1 -ing CSVResultFiles/July6/geno_me_0_ms_${MS}_fsigma_1_*.csv 
-#     echo "ploting $c"
-#     let "c+=1"
-# done
 
-python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July6/me_0_ms_1_fsigma_1_*.csv CSVResultFiles/July6/me_0_ms_5_fsigma_1_*.csv -out me_0_ms_1_fsigma_1 -ing CSVResultFiles/July6/geno_me_0_ms_*_fsigma_1_*.csv
+# --------------------------------------Smaller trails--------------------------------------------
+
+for MS in 1 5
+do
+    for FS in 1 5
+    do                      
+        # 10 trails for each set of parameters
+        for V in {1..10}
+        do
+            python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 20 -ms ${MS} -fsigma $FS -fmu 5 -fit 1 -fn "ms_${MS}_fsigma_${FS}_cost_0.5_$V" -ft 1 -memol 20 -c 0.5
+            # pids[${count}]=$!
+            let "count+=1"
+            echo "running $count"
+        done
+    done
+done
+
+
+for MS in 1 5
+do
+    for FS in 1 5
+    do          
+        # female sigma
+        python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/${date}/ms_${MS}_fsigma_*_cost_0.5_*.csv -outfolder female_sigma -out ms_${MS}_cost_0.5 -ing CSVResultFiles/$date/geno_ms_${MS}_fsigma_*_cost_0.5_*.csv
+        let "c+=1"
+        echo "ploting $c"
+        # male sigma
+        python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/$date/ms_*_fsigma_${FS}_cost_0.5_*.csv -outfolder male_sigma -out fs_${FS}_cost_0.5 -ing CSVResultFiles/$date/geno_ms_*_fsigma_${FS}_cost_0.5_*.csv
+        let "c+=1"
+        echo "ploting $c"
+    done
+done

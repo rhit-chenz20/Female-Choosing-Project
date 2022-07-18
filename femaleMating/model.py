@@ -26,10 +26,11 @@ class FemaleMatingModel():
         femaleType,
         memoryLength,
         flatcost,
-        fitbase
+        fitbase,
+        topPercent
     ):
         super().__init__()
-        date = "July6/"
+        date = "July18/"
         if not os.path.exists("CSVResultFiles/" + date):
             os.makedirs("CSVResultFiles/" + date)
         self.ran = Randomizer()
@@ -40,12 +41,13 @@ class FemaleMatingModel():
         self.flatcost = flatcost
         self.fitbase = fitbase 
         self.memoryLength = memoryLength
+        self.maleSigma = maleSigma
         self.generateFemale(femaleSize, fitness, femaleType, self.ran, femaleSigma, femaleMu)
-        self.maleDiv = maleSigma
         self.generation = 0
         self.maxGen = generations
         self.mutationSigma = mutationSigma * matingLength
         self.selection = selection
+        self.topPercent = topPercent
         self.fitfile = open("CSVResultFiles/" + date + filename + ".csv", "w+")
         self.fitwriter = csv.writer(self.fitfile)
         self.genefile = open("CSVResultFiles/" + date + 'geno_' +filename + ".csv", "w+")
@@ -76,7 +78,7 @@ class FemaleMatingModel():
         for female in self.females:
             for i in range(self.matingLength):
                 # sample a random male from the distribution
-                male = ran.ranMale(self.maleDiv)
+                male = ran.ranMale(self.maleSigma)
                 female.setCurrentMale(male)
                 # for test without mesa
                 female.step()
@@ -97,7 +99,7 @@ class FemaleMatingModel():
                 child.mutate(0.1, self.ran)
             elif(isinstance(parent[index], FemaleGenome)):
                 child = FemaleGenome(parent[index].genome, parent[index].fit, len(parent[index].memory),
-                parent[index].flatcost, parent[index].fitbase)
+                parent[index].flatcost, parent[index].fitbase, parent[index].ran, parent[index].malesigma)
                 child.mutate(self.mutationSigma, self.ran)
             self.females[x] = child
 
@@ -108,16 +110,16 @@ class FemaleMatingModel():
         self.sortFemale()
         # print(self.females[0].genome)
         if self.selection == 0 :
-            return self.top50()
+            return self.top50(self.topPercent)
         elif self.selection == 1:
             return self.tournament()
 
     """
     Choose the top 50% of females as the parent
     """
-    def top50(self):
+    def top50(self, per):
         parent = []
-        for x in range(int(len(self.females)/2)):
+        for x in range(int(len(self.females)*per)):
             parent.append(self.females[x])
         return parent
     
@@ -153,11 +155,11 @@ class FemaleMatingModel():
                 genome = []
                 for y in range(self.matingLength):
                     genome.append(ran.ranInt(2))
-                female = FemaleGenome(genome, fit = fitness, memoryLength= self.memoryLength, flatcost= self.flatcost, fitbase=self.fitbase)
+                female = FemaleGenome(genome, fit = fitness, memoryLength= self.memoryLength, flatcost= self.flatcost, fitbase=self.fitbase, ran=self.ran, malesigma=self.maleSigma)
                 self.females.append(female)
         elif (type == 0):
             for x in range(size):
-                female = FemaleThreshold(self.ran.threVal(femaleSigma, femaleMu), fit = fitness, fitbase = self.fitbase)
+                female = FemaleThreshold(self.ran.norran(femaleSigma, femaleMu), fit = fitness, fitbase = self.fitbase)
                 self.females.append(female)
             # self.schedule.add(female)
 
@@ -225,7 +227,7 @@ class FemaleMatingModel():
 
 class Randomizer():
 
-    def threVal(self, sigma, mu):
+    def norran(self, sigma, mu):
         return np.random.normal(mu, sigma)
 
     def ranInt(self, size):

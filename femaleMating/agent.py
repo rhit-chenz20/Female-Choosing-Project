@@ -116,7 +116,9 @@ class FemaleGenome(Female):
         fit,
         memoryLength,
         flatcost,
-        fitbase
+        fitbase,
+        ran,
+        malesigma
     ):
         """
         Create a new Female.
@@ -128,10 +130,12 @@ class FemaleGenome(Female):
         self.threshold = 0
         self.geneindex = 0
         self.flatcost = flatcost
+        self.ran = ran
+        self.malesigma = malesigma
 
     def step(self):
         self.memorize()
-        self.calThreshold()
+        self.calThreshold(self.ran)
         if(self.genome[self.geneindex] == 1):
             self.mate()
         self.calFitness()
@@ -158,10 +162,10 @@ class FemaleGenome(Female):
         else:
             return False
     
-    def calThreshold(self):
+    def calThreshold(self, ran):
         filtered = list(filter(lambda male: male != None, self.memory))
         if(len(filtered) != 0):
-            self.threshold = sum(filtered) / len(filtered)
+            self.threshold = ran.norran(self.malesigma,sum(filtered) / len(filtered))
         else:
             self.threshold = 0
 

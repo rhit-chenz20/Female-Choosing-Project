@@ -10,18 +10,19 @@ class Plot():
         self,
         fitfilenames,
         genofilenames,
-        output
+        output,
+        outfolder
         ):
-        date = "July6/"
+        date = "July18/"
         # self.names = ["Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"]
         self.names = ["Ave_Fitness", "All_Mate",]
         self.genonames = ['best_mate_', 'worst_mate_']
         self.labels = ['Average Fitness', 'Sta Dev Fitness', 'Average Threshold', 'Sta Dev Threshold']
         self.fignames = ['ave_fit', 'sta_fit', 'ave_the', 'sta_the']
-        self.output = 'ResultPlot/' + date
+        self.output = 'ResultPlot/' + date + outfolder
         if not os.path.exists(self.output):
             os.makedirs(self.output)
-        self.output += output
+        self.output += "/" + output
 
         self.fitfilenames = []
         self.genofilenames = []
@@ -41,7 +42,9 @@ class Plot():
             group = gdictionary.get(key,[])
             group.append(x)  
             gdictionary[key] = group
+
         self.genofilenames = gdictionary.values()
+        # print(list(gdictionary.keys()))
 
         sample1 = list(gdictionary.keys())[0].split('_')
         sample2 = list(gdictionary.keys())[1].split('_')
@@ -54,16 +57,36 @@ class Plot():
         self.legends = []
         for key in gdictionary.keys():
             li = key.split('_')
-            self.legends.append(self.processwords(li[diIndex]) + ' ' + li[diIndex+1])
-            self.legends.append(self.processwords(li[diIndex]) + ' ' + li[diIndex+1] + ' CI')
+            label = self.processwords(diIndex, li)
+            self.legends.append(label)
+            self.legends.append(label + ' CI')                
 
         self.plot()
 
-    def processwords(self, word):
-        if(word == "ms"):
-            return 'Male Sigma'
-        elif (word == 'me'):
-            return 'Memory Length'
+    def processwords(self, index, li:list):
+        # print(index)
+        if(li[index] == "ms"):
+            return 'Male Sigma ' + li[index+1]
+        elif (li[index] == 'me'):
+            return 'Memory Length ' + li[index+1]
+        elif(li[index] == "ml"):
+            return 'Mating Length ' + li[index+1]
+        elif(li[index] == 'fmu'):
+            return 'Female Mu ' + li[index+1]
+        elif (li[index] == 'selper'):
+            return 'Selection Percent ' + li[index+1]
+        elif(li[index] == 'fit'):
+            spe=''
+            if(li[index+1] == '0'):
+                spe = 'Average males fitness'
+            elif(li[index+1] == '1'):
+                spe = 'Lowest male fitness'
+            # print(spe)
+            return spe
+        elif(li[index] == 'fsigma'):
+            return 'Female Sigma ' + li[index+1]
+        elif(li[index] == 'cost'):
+            return 'Flat Cost ' + li[index+1]
     
     def plot(self):
         fit_datas = []
@@ -127,30 +150,37 @@ class Plot():
         plt.savefig(self.output + ".png")
 
     def plotFigWOThre(self, fitdatas, best, worst):
-        axd = plt.figure(figsize=(14,8)).subplot_mosaic(
+        mosaic = """AB"""
+        letters = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
+
+        for x in range(2*len(best)):
+            mosaic+="\n"+letters[x]+letters[x]
+       
+        axd = plt.figure(figsize=(18,len(best)*8)).subplot_mosaic(
         """
         AB
         CC
         DD
+        EE
+        FF
         """,
         )
         colo = iter(plt.cm.rainbow(np.linspace(0, 1, len(fitdatas))))
         for fit_cancat in fitdatas:
             c = next(colo)
-
             self.lineplot(axd['A'],fit_cancat,'Ave_Fitness',"Average Fitness",c)
             self.lineplot(axd['B'],fit_cancat,'All_Mate',"All Mating Steps",c)
-            
-        axd['A'].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
-        axd['B'].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
+        # axd['A'].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
+        # axd['B'].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
 
-        self.plotHeatmap(axd['C'], pd.concat(objs=best).to_numpy(), 'Best Female', 'Steps')
-        self.plotHeatmap(axd['D'], pd.concat(objs=worst).to_numpy(), 'Worst Female', 'Steps')
+        for x in range(len(best)):
+            self.plotHeatmap(axd[letters[2*x]], best[x].to_numpy(), 'Best Female of '+self.legends[2*x], 'Steps')
+            self.plotHeatmap(axd[letters[2*x+1]], worst[x].to_numpy(), 'Worst Female of '+self.legends[2*x], 'Steps')
         
         identify_axes(axd)
         plt.tight_layout()
-        plt.show()
-        # plt.savefig(self.output + ".png")
+        # plt.show()
+        plt.savefig(self.output + ".pdf")
 
     def lineplot(self, ax, li,y, ylabel, c):
         sns.lineplot(
@@ -160,11 +190,15 @@ class Plot():
             marker='', color = c
         )
         ax.set(xlabel='Generation', ylabel=ylabel)
+        ax.legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
 
     def plotHeatmap(self, ax, li, title, ylabel):
-        sns.heatmap(li, ax =ax)
+        sns.heatmap(li, ax =ax, cmap="Greens",vmin=0, vmax=1)
         ax.invert_yaxis()
         ax.set(xlabel='Generation', ylabel=ylabel, title=title)
+        c_bar = ax.collections[0].colorbar
+        c_bar.set_ticks([0, 0.25, 0.5, 0.75, 1])
+        c_bar.set_ticklabels(["0% Female Mate", "25% Female Mate", "50% Female Mate", "75% Female Mate", "100% Female Mate", ])
 
 # https://matplotlib.org/stable/tutorials/provisional/mosaic.html
 # Helper function used for visualization in the following examples
