@@ -1,7 +1,4 @@
 import copy
-import numpy as np
-from mesa import Agent
-import math
 
 class Female():
     def __init__(
@@ -29,38 +26,14 @@ class Female():
         self.adjustCost()
 
     def calFitness(self):
-        if(self.fit == 0):
-            self.calFitnessAve()
-        elif (self.fit == 1):
-            self.calFitnessLow()
-        elif(self.fit == 2):
-            self.calFitnessWeighted()
+        self.fit.cal_fitness(self)
     
     def setCurrentMale(self, male):
         self.currentMale = male
 
     def mate(self):
         pass
-    
-    """
-    Calculate the female's fitness by averaging her mated males' fitness
-    """
-    def calFitnessAve(self):
-        if(len(self.mates) != 0):
-            self.fitness = sum(self.mates) / len(self.mates)
-        else:
-            self.fitness = 0
-
-    def calFitnessLow(self):
-        if(len(self.mates) == 0):
-            self.fitness = 0
-        else: 
-            self.fitness = min(self.mates)
-
-    def calFitnessWeighted(self):
-        for x in range(len(self.mates)):
-            self.fitness += (math.pow(self.fitbase, len(self.mates - x)) * self.mates[x])
-    
+            
     def adjustCost(self):
         self.flatCost()
         self.varCost()
@@ -124,7 +97,6 @@ class FemaleGenome(Female):
         Create a new Female.
         """
         super().__init__(fit,fitbase, flatcost)
-        #list
         self.genome = copy.deepcopy(genome)
         self.memory = [None] * memoryLength
         self.threshold = 0
@@ -132,12 +104,14 @@ class FemaleGenome(Female):
         self.flatcost = flatcost
         self.ran = ran
         self.malesigma = malesigma
+        self.mating_steps = 0
 
     def step(self):
         self.memorize()
         self.calThreshold(self.ran)
         if(self.genome[self.geneindex] == 1):
             self.mate()
+            self.mating_steps += 1
         self.calFitness()
         self.adjustCost()
         self.geneindex+=1
@@ -165,7 +139,8 @@ class FemaleGenome(Female):
     def calThreshold(self, ran):
         filtered = list(filter(lambda male: male != None, self.memory))
         if(len(filtered) != 0):
-            self.threshold = ran.norran(self.malesigma,sum(filtered) / len(filtered))
+            self.threshold = sum(filtered) / len(filtered)
+            # self.threshold = ran.norran(self.malesigma,sum(filtered) / len(filtered))
         else:
             self.threshold = 0
 

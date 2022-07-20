@@ -10,7 +10,7 @@ args = parser.parse_args()
 
 model = Plot(
     fitfilenames = args.fitfilenames,
-    genofilenames = args.gefilenames,
+    lastfilenames = args.gefilenames,
     output = args.outputFilename,
     outfolder=args.outputFolder
 )

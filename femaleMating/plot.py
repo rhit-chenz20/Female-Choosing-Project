@@ -9,23 +9,23 @@ class Plot():
     def __init__(
         self,
         fitfilenames,
-        genofilenames,
+        lastfilenames,
         output,
         outfolder
         ):
-        date = "July18/"
         # self.names = ["Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"]
-        self.names = ["Ave_Fitness", "All_Mate",]
-        self.genonames = ['best_mate_', 'worst_mate_']
+        self.names = ["Generation","Ave_Fitness", "All_Mate",]
+        # self.genonames = ['best_mate', 'worst_mate']
+        self.lastnames = ["Mating_Steps", "Fitness_Mating", "Num_Look_Before_1_Mating"]
         self.labels = ['Average Fitness', 'Sta Dev Fitness', 'Average Threshold', 'Sta Dev Threshold']
-        self.fignames = ['ave_fit', 'sta_fit', 'ave_the', 'sta_the']
-        self.output = 'ResultPlot/' + date + outfolder
+        # self.fignames = ['ave_fit', 'sta_fit', 'ave_the', 'sta_the']
+        self.output = 'ResultPlot/' + outfolder
         if not os.path.exists(self.output):
             os.makedirs(self.output)
         self.output += "/" + output
 
         self.fitfilenames = []
-        self.genofilenames = []
+        self.lastfilenames = []
         dictionary = {}  
         for x in fitfilenames:  
             li = x.split('_')
@@ -36,18 +36,18 @@ class Plot():
         self.fitfilenames = dictionary.values()
 
         gdictionary = {}  
-        for x in genofilenames:  
+        for x in lastfilenames:  
             li = x.split('_')
             key = x[:x.index(li[len(li)-1])]
             group = gdictionary.get(key,[])
             group.append(x)  
             gdictionary[key] = group
 
-        self.genofilenames = gdictionary.values()
+        self.lastfilenames = gdictionary.values()
         # print(list(gdictionary.keys()))
 
-        sample1 = list(gdictionary.keys())[0].split('_')
-        sample2 = list(gdictionary.keys())[1].split('_')
+        sample1 = list(dictionary.keys())[0].split('_')
+        sample2 = list(dictionary.keys())[1].split('_')
         diIndex = 0
         for x in range(len(sample1)):
             if(sample1[x] != sample2[x]):
@@ -55,7 +55,7 @@ class Plot():
                 break
 
         self.legends = []
-        for key in gdictionary.keys():
+        for key in dictionary.keys():
             li = key.split('_')
             label = self.processwords(diIndex, li)
             self.legends.append(label)
@@ -64,7 +64,6 @@ class Plot():
         self.plot()
 
     def processwords(self, index, li:list):
-        # print(index)
         if(li[index] == "ms"):
             return 'Male Sigma ' + li[index+1]
         elif (li[index] == 'me'):
@@ -92,30 +91,36 @@ class Plot():
         fit_datas = []
         bests=[]
         worsts=[]
+        lasts = []
 
         for stack1 in self.fitfilenames:
             fit_data = []
-            for file1 in stack1:
-                df1 = pd.read_csv(file1, index_col=False).reset_index()
-                fit_data.append(df1)
-            fit_datas.append(fit_data) 
-            
-        for stack2 in self.genofilenames:
             best_data = []
             worst_data = []
-            for file2 in stack2:
-                df2 = pd.read_csv(file2, index_col=False)
-                best_data.append(df2.loc[:, df2.columns!='Generation'].filter(regex="^best_mate"))
-                worst_data.append(df2.loc[:, df2.columns!='Generation'].filter(regex="^worst_mate"))
+            for file1 in stack1:
+                df1 = pd.read_csv(file1, index_col=False).reset_index()
+                fit_data.append(df1.filter(items=self.names))
+                best_data.append(df1.loc[:, df1.columns!='Generation'].filter(regex="^best_mate"))
+                worst_data.append(df1.loc[:, df1.columns!='Generation'].filter(regex="^worst_mate"))
+            fit_datas.append(fit_data) 
             bests.append(best_data)
             worsts.append(worst_data)
+            
+        for stack2 in self.lastfilenames:
+            last = []
+            for file2 in stack2:
+                df2 = pd.read_csv(file2, index_col=False)
+                last.append(df2)
+            lasts.append(last)
 
         for x in range(len(fit_datas)):
             fit_datas[x] = pd.concat(objs=fit_datas[x], ignore_index=True)
             bests[x] = pd.concat(objs=bests[x]).groupby(level=0).mean().T
             worsts[x] = pd.concat(objs = worsts[x]).groupby(level=0).mean().T
+            lasts[x] = pd.concat(objs = lasts[x]).groupby(level=0).mean()
+            # print(lasts[x])
 
-        self.plotFigWOThre(fit_datas, bests, worsts)
+        self.plotFigWOThre(fit_datas, bests, worsts, lasts)
 
     def plotFig(self, data1, foo, geno):
         axd = plt.figure(figsize=(14,10)).subplot_mosaic(
@@ -149,47 +154,46 @@ class Plot():
         # plt.show()
         plt.savefig(self.output + ".png")
 
-    def plotFigWOThre(self, fitdatas, best, worst):
-        mosaic = """AB"""
-        letters = ['C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
+    def plotFigWOThre(self, fitdatas, best, worst, lasts):
+        mosaic = "AB\nCD"
+
+        letters = ['E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
 
         for x in range(2*len(best)):
             mosaic+="\n"+letters[x]+letters[x]
-       
-        axd = plt.figure(figsize=(18,len(best)*8)).subplot_mosaic(
-        """
-        AB
-        CC
-        DD
-        EE
-        FF
-        """,
-        )
+
+        mosaic = """{}""".format(mosaic)
+
+        axd = plt.figure(figsize=(18,len(best)*10)).subplot_mosaic(mosaic)
         colo = iter(plt.cm.rainbow(np.linspace(0, 1, len(fitdatas))))
-        for fit_cancat in fitdatas:
+        for x in range(len(fitdatas)):
             c = next(colo)
-            self.lineplot(axd['A'],fit_cancat,'Ave_Fitness',"Average Fitness",c)
-            self.lineplot(axd['B'],fit_cancat,'All_Mate',"All Mating Steps",c)
-        # axd['A'].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
-        # axd['B'].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
+            self.lineplot(axd['A'],fitdatas[x],'Generation','Ave_Fitness',"Generation","Average Fitness",c)
+            self.lineplot(axd['B'],fitdatas[x],'Generation','All_Mate',"Generation","All Mating Steps",c)
+            sns.regplot(x=lasts[x]['Mating_Steps'],y=lasts[x]['Fitness_Mating'], lowess=True, scatter=True, ax = axd['C'], color = c, ci=95)
+            sns.regplot(x=lasts[x]['Num_Look_Before_1_Mating'],y=lasts[x]['Fitness_Mating'], lowess=True, scatter=True, ax = axd['D'], color = c, ci=95)
+            # self.lineplot(axd['C'],lasts[x],'Mating_Steps','Fitness_Mating',"Mating Steps","Female's Fitness",c)
+            # self.lineplot(axd['D'],lasts[x],'Num_Look_Before_1_Mating','Fitness_Mating',"Look Steps before First Mate","Female's Fitness",c)
 
         for x in range(len(best)):
             self.plotHeatmap(axd[letters[2*x]], best[x].to_numpy(), 'Best Female of '+self.legends[2*x], 'Steps')
             self.plotHeatmap(axd[letters[2*x+1]], worst[x].to_numpy(), 'Worst Female of '+self.legends[2*x], 'Steps')
+            # self.plotHeatmap(axd[letters[2*x]], best[x].to_numpy(), 'Best Female of ', 'Steps')
+            # self.plotHeatmap(axd[letters[2*x+1]], worst[x].to_numpy(), 'Worst Female of ', 'Steps')
         
         identify_axes(axd)
         plt.tight_layout()
         # plt.show()
         plt.savefig(self.output + ".pdf")
 
-    def lineplot(self, ax, li,y, ylabel, c):
+    def lineplot(self, ax, li, x,y,xlabel, ylabel, c):
         sns.lineplot(
             data=li,
             ax=ax,
-            x=li["Generation"], y=li[y],
+            x=li[x], y=li[y],
             marker='', color = c
         )
-        ax.set(xlabel='Generation', ylabel=ylabel)
+        ax.set(xlabel=xlabel, ylabel=ylabel)
         ax.legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
 
     def plotHeatmap(self, ax, li, title, ylabel):

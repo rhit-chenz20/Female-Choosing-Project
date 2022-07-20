@@ -20,6 +20,7 @@ parser.add_argument('-memol', '--memoryLength', type = int, default=0, required=
 parser.add_argument('-c', '--flatCost', type = float, default=0, required=False)
 parser.add_argument('-base', '--fitbase', type = float, default=0.5, required=False)
 parser.add_argument('-per', '--topPercent', type = float, default=0.5, required=False)
+parser.add_argument('-d', '--date', type = str, required=True)
 args = parser.parse_args()
 
 model = FemaleMatingModel(
@@ -37,9 +38,10 @@ model = FemaleMatingModel(
     memoryLength= args.memoryLength,
     flatcost=args.flatCost,
     fitbase = args.fitbase,
-    topPercent= args.topPercent
+    topPercent= args.topPercent,
+    date = args.date
 )
 
 # for running without mesa
-for x in range(model.maxGen):
-    model.step()
+# for x in range(model.maxGen):
+#     model.step()
