@@ -42,6 +42,8 @@ model = FemaleMatingModel(
     date = args.date
 )
 
+model.start()
+
 # for running without mesa
 # for x in range(model.maxGen):
 #     model.step()

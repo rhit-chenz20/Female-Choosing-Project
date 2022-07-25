@@ -30,5 +30,9 @@ class LowestFitness(FitnessFunction):
 
 class LastMalePrecedentFitness(FitnessFunction):
     def cal_fitness(self, female):
-        for x in range(len(female.mates)):
-            female.fitness += (math.pow(female.fitbase, len(female.mates - x)) * female.mates[x])
+        female.fitness = 0
+        if(len(female.mates) != 0):
+            # print(female.mates)
+            for x in range(len(female.mates)):
+                female.fitness += math.pow(female.fitbase, len(female.mates) - x) * female.mates[x]
+

@@ -1,4 +1,5 @@
 import copy
+from abc import abstractmethod
 
 class Female():
     def __init__(
@@ -23,15 +24,20 @@ class Female():
     def step(self):
         self.mate()
         self.calFitness()
-        self.adjustCost()
 
     def calFitness(self):
         self.fit.cal_fitness(self)
+        self.adjustCost()
     
     def setCurrentMale(self, male):
         self.currentMale = male
 
+    @abstractmethod
     def mate(self):
+        pass
+
+    @abstractmethod
+    def mutate(self, sigma, ran):
         pass
             
     def adjustCost(self):
@@ -90,8 +96,7 @@ class FemaleGenome(Female):
         memoryLength,
         flatcost,
         fitbase,
-        ran,
-        malesigma
+        ran
     ):
         """
         Create a new Female.
@@ -103,7 +108,6 @@ class FemaleGenome(Female):
         self.geneindex = 0
         self.flatcost = flatcost
         self.ran = ran
-        self.malesigma = malesigma
         self.mating_steps = 0
 
     def step(self):
@@ -112,8 +116,6 @@ class FemaleGenome(Female):
         if(self.genome[self.geneindex] == 1):
             self.mate()
             self.mating_steps += 1
-        self.calFitness()
-        self.adjustCost()
         self.geneindex+=1
 
     def memorize(self):

@@ -69,7 +69,6 @@ class FemaleMatingModel():
             title.append(genotitle + "_mate_"+str(x+1))
         # title += ["Fit_Mate_First","Fit_Others"]
         self.writeToFile(self.fitwriter, title)
-        self.start()
 
     def generateFemale(self, size, fitness, type, ran, femaleSigma, femaleMu):
         """
@@ -81,7 +80,7 @@ class FemaleMatingModel():
                 genome = []
                 for y in range(self.matingLength):
                     genome.append(ran.ranInt(2))
-                female = FemaleGenome(genome, fit = function, memoryLength= self.memoryLength, flatcost= self.flatcost, fitbase=self.fitbase, ran=self.ran, malesigma=self.maleSigma)
+                female = FemaleGenome(genome, fit = function, memoryLength= self.memoryLength, flatcost= self.flatcost, fitbase=self.fitbase, ran=self.ran)
                 self.females.append(female)
         elif (type == 0):
             for x in range(size):
@@ -209,14 +208,7 @@ class FemaleMatingModel():
         self.lastfile.close() 
 
     def evolve(self, ran):
-        for female in self.females:
-            for i in range(self.matingLength):
-                # sample a random male from the distribution
-                male = ran.ranMale(self.maleSigma)
-                female.setCurrentMale(male)
-                # for test without mesa
-                female.step()
-        self.females.sort(reverse=True)
+        self.step(ran)
         data = [self.generation]
         data += self.calDataNoThre() + self.bestWorstIndi()
 
@@ -224,6 +216,17 @@ class FemaleMatingModel():
         if self.generation < self.maxGen:
             self.reproduce()
             self.generation += 1
+
+    def step(self, ran):
+        for female in self.females:
+            for i in range(self.matingLength):
+                # sample a random male from the distribution
+                male = ran.ranMale(self.maleSigma)
+                female.setCurrentMale(male)
+                # for test without mesa
+                female.step()
+            female.calFitness()
+        self.females.sort(reverse=True)
 
     def reproduce(self):
         """

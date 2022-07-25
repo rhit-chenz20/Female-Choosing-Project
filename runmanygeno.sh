@@ -1,5 +1,5 @@
 # !/bin/bash
-declare date="July20"
+declare date="July22"
 # # maleMu = 5
 # # 2 fitness function (0-average, 1-lowest)
 # for FIT in 0 
@@ -120,15 +120,19 @@ declare date="July20"
 # do
 #     for MU in 0.001
 #     do
-#         for FIT in 1 0
-#         do           
-#             # 10 trails for each set of parameters
-#             for V in {1..10}
-#             do
-#                 python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 20 -ms ${MS} -fsigma 1 -fmu 5 -fit ${FIT} -fn "ms_${MS}_fit_${FIT}_cost_1_mut_${MU}_$V" -ft 1 -memol 20 -c 1 -d ${date} -mul ${MU} -max 500
-#                 # pids[${count}]=$!
-#                 let "count+=1"
-#                 echo "running $count"
+#         for FIT in 1
+#         do          
+#             for COST in 0 0.5
+#             do 
+#                 # 10 trails for each set of parameters
+#                 for V in {1..10}
+#                 do
+#                     let "count+=1"
+#                     echo "running $count"               
+#                     python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 20 -ms ${MS} -fsigma 1 -fmu 5 -fit ${FIT} -fn "ms_${MS}_fit_${FIT}_cost_${COST}_mut_${MU}_$V" -ft 1 -memol 20 -c $COST -d ${date} -mul ${MU} -max 500
+#                     # pids[${count}]=$!
+#                     echo "finished $count"     
+#                 done
 #             done
 #         done
 #     done
@@ -137,12 +141,15 @@ declare date="July20"
 
 for MS in 5
 do
-    for MU in 0.001 0.003 0.005
+    for MU in 0.001
     do
-        # male sigma
-        let "c+=1"
-        echo "ploting $c"        
-        python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/$date/ms_${MS}_fit_*_cost_1_mut_${MU}_*.csv -outfolder ${date}/fitness_function -out ms_${MS}_cost_1_mut_${MU} -ing CSVResultFiles/$date/last_ms_${MS}_fit_*_cost_1_mut_${MU}_*.csv
-        echo "finished ploting $c"
+        for FIT in 1
+        do          
+            # cost
+            let "c+=1"
+            echo "ploting $c"        
+            python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/$date/ms_${MS}_fit_${FIT}_cost_*_mut_${MU}_*.csv -outfolder ${date}/fitness_function -out ms_${MS}_mut_${MU} -ing CSVResultFiles/$date/last_ms_${MS}_fit_${FIT}_cost_*_mut_${MU}_*.csv
+            echo "finished ploting $c"
+        done
     done
 done

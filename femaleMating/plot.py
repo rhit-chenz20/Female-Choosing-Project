@@ -170,8 +170,8 @@ class Plot():
             c = next(colo)
             self.lineplot(axd['A'],fitdatas[x],'Generation','Ave_Fitness',"Generation","Average Fitness",c)
             self.lineplot(axd['B'],fitdatas[x],'Generation','All_Mate',"Generation","All Mating Steps",c)
-            sns.regplot(x=lasts[x]['Mating_Steps'],y=lasts[x]['Fitness_Mating'], lowess=True, scatter=True, ax = axd['C'], color = c, ci=95)
-            sns.regplot(x=lasts[x]['Num_Look_Before_1_Mating'],y=lasts[x]['Fitness_Mating'], lowess=True, scatter=True, ax = axd['D'], color = c, ci=95)
+            sns.regplot(x=lasts[x]['Mating_Steps'],y=lasts[x]['Fitness_Mating'], lowess=True, scatter=True, ax = axd['C'], color = c)
+            sns.regplot(x=lasts[x]['Num_Look_Before_1_Mating'],y=lasts[x]['Fitness_Mating'], lowess=True, scatter=True, ax = axd['D'], color = c)
             # self.lineplot(axd['C'],lasts[x],'Mating_Steps','Fitness_Mating',"Mating Steps","Female's Fitness",c)
             # self.lineplot(axd['D'],lasts[x],'Num_Look_Before_1_Mating','Fitness_Mating',"Look Steps before First Mate","Female's Fitness",c)
 
