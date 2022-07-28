@@ -11,10 +11,10 @@ class Plot():
         fitfilenames,
         lastfilenames,
         output,
-        outfolder
+        outfolder,
+        type
         ):
-        # self.names = ["Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"]
-        self.names = ["Generation","Ave_Fitness", "All_Mate",]
+        self.genoNames = ["Generation","Ave_Fitness", "All_Mate",]
         # self.genonames = ['best_mate', 'worst_mate']
         self.lastnames = ["Mating_Steps", "Fitness_Mating", "Num_Look_Before_1_Mating"]
         self.labels = ['Average Fitness', 'Sta Dev Fitness', 'Average Threshold', 'Sta Dev Threshold']
@@ -23,28 +23,32 @@ class Plot():
         if not os.path.exists(self.output):
             os.makedirs(self.output)
         self.output += "/" + output
+        if(type == 1):
+            self._setupGeno(fitfilenames,lastfilenames)
+        elif(type == 0):
+            self._setupThre(fitfilenames)
 
-        self.fitfilenames = []
-        self.lastfilenames = []
+    def _setupGeno(self,ffilenames,lfilenames):
+        fitfilenames = []
+        lastfilenames = []
         dictionary = {}  
-        for x in fitfilenames:  
+        for x in ffilenames:  
             li = x.split('_')
             key = x[:x.index(li[len(li)-1])]
             group = dictionary.get(key,[])
             group.append(x)  
             dictionary[key] = group
-        self.fitfilenames = dictionary.values()
+        fitfilenames = dictionary.values()
 
         gdictionary = {}  
-        for x in lastfilenames:  
+        for x in lfilenames:  
             li = x.split('_')
             key = x[:x.index(li[len(li)-1])]
             group = gdictionary.get(key,[])
             group.append(x)  
             gdictionary[key] = group
 
-        self.lastfilenames = gdictionary.values()
-        # print(list(gdictionary.keys()))
+        lastfilenames = gdictionary.values()
 
         sample1 = list(dictionary.keys())[0].split('_')
         sample2 = list(dictionary.keys())[1].split('_')
@@ -57,13 +61,38 @@ class Plot():
         self.legends = []
         for key in dictionary.keys():
             li = key.split('_')
-            label = self.processwords(diIndex, li)
+            label = self._processwords(diIndex, li)
             self.legends.append(label)
-            self.legends.append(label + ' CI')                
+            self.legends.append(label + ' CI')    
+        self._dataProcessGeno(fitfilenames, lastfilenames)            
 
-        self.plot()
+    def _setupThre(self, ffilenames):
+        dictionary = {}  
+        for x in ffilenames:  
+            li = x.split('_')
+            key = x[:x.index(li[len(li)-1])]
+            group = dictionary.get(key,[])
+            group.append(x)  
+            dictionary[key] = group
+        filenames = dictionary.values()
 
-    def processwords(self, index, li:list):
+        sample1 = list(dictionary.keys())[0].split('_')
+        sample2 = list(dictionary.keys())[1].split('_')
+        diIndex = 0
+        for x in range(len(sample1)):
+            if(sample1[x] != sample2[x]):
+                diIndex = x-1
+                break
+
+        self.legends = []
+        for key in dictionary.keys():
+            li = key.split('_')
+            label = self._processwords(diIndex, li)
+            self.legends.append(label) 
+
+        self._dataProcessThre(filenames)
+
+    def _processwords(self, index, li:list):
         if(li[index] == "ms"):
             return 'Male Sigma ' + li[index+1]
         elif (li[index] == 'me'):
@@ -80,33 +109,39 @@ class Plot():
                 spe = 'Average males fitness'
             elif(li[index+1] == '1'):
                 spe = 'Lowest male fitness'
-            # print(spe)
             return spe
         elif(li[index] == 'fsigma'):
             return 'Female Sigma ' + li[index+1]
         elif(li[index] == 'cost'):
             return 'Flat Cost ' + li[index+1]
+        elif(li[index] == 'sel'):
+            spe=''
+            if(li[index+1] == '0'):
+                spe = 'Top 50% Selection'
+            elif(li[index+1] == '1'):
+                spe = 'Tournament Selection'
+            return spe            
     
-    def plot(self):
+    def _dataProcessGeno(self, fitfilenames, lastfilenames):
         fit_datas = []
         bests=[]
         worsts=[]
         lasts = []
 
-        for stack1 in self.fitfilenames:
+        for stack1 in fitfilenames:
             fit_data = []
             best_data = []
             worst_data = []
             for file1 in stack1:
                 df1 = pd.read_csv(file1, index_col=False).reset_index()
-                fit_data.append(df1.filter(items=self.names))
+                fit_data.append(df1.filter(items=self.genoNames))
                 best_data.append(df1.loc[:, df1.columns!='Generation'].filter(regex="^best_mate"))
                 worst_data.append(df1.loc[:, df1.columns!='Generation'].filter(regex="^worst_mate"))
             fit_datas.append(fit_data) 
             bests.append(best_data)
             worsts.append(worst_data)
             
-        for stack2 in self.lastfilenames:
+        for stack2 in lastfilenames:
             last = []
             for file2 in stack2:
                 df2 = pd.read_csv(file2, index_col=False)
@@ -115,42 +150,58 @@ class Plot():
 
         for x in range(len(fit_datas)):
             fit_datas[x] = pd.concat(objs=fit_datas[x], ignore_index=True)
-            bests[x] = pd.concat(objs=bests[x]).groupby(level=0).mean().T
-            worsts[x] = pd.concat(objs = worsts[x]).groupby(level=0).mean().T
-            lasts[x] = pd.concat(objs = lasts[x]).groupby(level=0).mean()
+            bests[x] = pd.concat(objs=bests[x]).groupby("Generation").mean().T
+            worsts[x] = pd.concat(objs = worsts[x]).groupby("Generation").mean().T
+            lasts[x] = pd.concat(objs = lasts[x]).groupby("Generation").mean()
             # print(lasts[x])
 
         self.plotFigWOThre(fit_datas, bests, worsts, lasts)
 
-    def plotFig(self, data1, foo, geno):
-        axd = plt.figure(figsize=(14,10)).subplot_mosaic(
+    def _dataProcessThre(self, filenames):
+        thre_datas = []
+        datas = []
+        for stack1 in filenames:
+            thre_data = []
+            for file1 in stack1:
+                df1 = pd.read_csv(file1, index_col=False).reset_index()
+                thre_data.append(df1)
+            thre_datas.append(thre_data) 
+        for x in range(len(thre_datas)):
+            datas.append(pd.concat(objs=thre_datas[x], ignore_index=True).groupby("Generation").mean())
+        self.plotFigWTher(thre_datas, datas)
+
+    def plotFigWTher(self, thre, thre_conc):
+
+        threNames = ["Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"]
+
+        axd = plt.figure(figsize=(18,8)).subplot_mosaic(
         """
         AB
-        CC
-        DD
+        CD
         """,
         )
-        for y in range(len(self.names)):
-            
-            color = iter(plt.cm.rainbow(np.linspace(0, 1, len(data1))))
-            
-            for x in range(len(data1)):
-                c=next(color)
-                data1[x].plot(x='Generation', y=self.names[y], ax=list(axd.values())[y], kind='scatter', label=x, c=c,)
+        color = []
         
-            sns.regplot(x=foo['Generation'],y=foo[self.names[y]], lowess=True, scatter=False, ax = list(axd.values())[y])
-            list(axd.values())[y].set(xlabel='Generation', ylabel=self.labels[y])
-
-        axd['C'] = sns.heatmap(geno)
-        axd['C'].invert_yaxis()
-        axd['C'].set(xlabel='Generation', ylabel='Steps', title='Mate Percentage for each step')
-
-        axd['D'] = sns.heatmap(geno)
-        axd['D'].invert_yaxis()
-        axd['D'].set(xlabel='Generation', ylabel='Steps', title='Mate Percentage for each step')
-
+        # four graph
+        for y in range(len(threNames)):
+            color_lines = iter(plt.cm.rainbow(np.linspace(0, 1, len(thre_conc))))
+            # 2 sets
+            for x in range(len(thre_conc)):
+                c_line=next(color_lines)
+                
+                color.append(c_line)
+                sns.regplot(x=thre_conc[x]['index'],y=thre_conc[x][threNames[y]], lowess=True, 
+                    scatter=False, ax = list(axd.values())[y], color = c_line)
+                color_dots = iter(plt.cm.rainbow(np.linspace(0, 1, len(thre[0]))))
+                # dots
+                for z in range(len(thre[0])):
+                    thre[x][z].plot(x='Generation', y=threNames[y], ax=list(axd.values())[y], kind='scatter', c=next(color_dots),label='_nolegend_')
+            list(axd.values())[y].set(xlabel='Generation', ylabel=self.labels[y-1])
         
+        list(axd.values())[1].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
+
         identify_axes(axd)
+        plt.tight_layout()
         # plt.show()
         plt.savefig(self.output + ".png")
 

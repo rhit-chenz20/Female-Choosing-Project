@@ -1,4 +1,3 @@
-import mesa
 import statistics
 import random
 import csv
@@ -34,17 +33,20 @@ class FemaleMatingModel():
     ):
         super().__init__()
         out = "CSVResultFiles/" + date
+        if femaleType == 1:
+            out += "/Genome"
+        elif femaleType == 0:
+            out += "/Threshold"
         if not os.path.exists(out):
             os.makedirs(out)
         self.ran = Randomizer()
         self.females = []
         self.males = []
         self.matingLength = matingLength
-        self.flatcost = flatcost
-        self.fitbase = fitbase 
         self.memoryLength = memoryLength
         self.maleSigma = maleSigma
-        self.generateFemale(femaleSize, fitness, femaleType, self.ran, femaleSigma, femaleMu)
+        self.femaleType = femaleType
+        self.generateFemale(femaleSize, fitness, femaleType, self.ran, femaleSigma, femaleMu, flatcost, fitbase)
         self.generation = 0
         self.maxGen = generations
         self.mutationSigma = mutationSigma * matingLength
@@ -52,25 +54,24 @@ class FemaleMatingModel():
         self.topPercent = topPercent
         self.fitfile = open(out+'/' + filename + ".csv", "w+")
         self.fitwriter = csv.writer(self.fitfile)
-        self.lastfile = open(out+'/' + 'last_' +filename + ".csv", "w+")
-        self.lastwriter = csv.writer(self.lastfile)
-        self.writeToFile(self.lastwriter, ["Mating_Steps", "Fitness_Mating", "Num_Look_Before_1_Mating"])
-        # self.genefile = open(out+'/' + 'geno_' +filename + ".csv", "w+")
-        # self.genowriter = csv.writer(self.genefile)
-        # self.writeToFile(self.fitwriter,["Generation", "Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"])
-        # self.writeToFile(self.fitwriter,["Generation", "Ave_Fitness", "All_Mate"])
-        title = ["Generation", "Ave_Fitness", "All_Mate","Fit_Mate_First","Fit_Others"]
-        genotitle =''
-        genotitle+= 'best'
-        for x in range(matingLength):
-            title.append(genotitle + "_mate_"+str(x+1))
-        genotitle = 'worst'
-        for x in range(matingLength):
-            title.append(genotitle + "_mate_"+str(x+1))
-        # title += ["Fit_Mate_First","Fit_Others"]
+        if(femaleType == 1):
+            self.lastfile = open(out+'/' + 'last_' +filename + ".csv", "w+")
+            self.lastwriter = csv.writer(self.lastfile)    
+            self.writeToFile(self.lastwriter, ["Mating_Steps", "Fitness_Mating", "Num_Look_Before_1_Mating"])
+        
+            title = ["Generation", "Ave_Fitness", "All_Mate","Fit_Mate_First","Fit_Others"]
+            genotitle =''
+            genotitle+= 'best'
+            for x in range(matingLength):
+                title.append(genotitle + "_mate_"+str(x+1))
+            genotitle = 'worst'
+            for x in range(matingLength):
+                title.append(genotitle + "_mate_"+str(x+1))
+        elif(femaleType == 0):
+            title = ["Generation","Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"]
         self.writeToFile(self.fitwriter, title)
 
-    def generateFemale(self, size, fitness, type, ran, femaleSigma, femaleMu):
+    def generateFemale(self, size, fitness, type, ran, femaleSigma, femaleMu, flatcost, fitbase):
         """
         Generate females
         """
@@ -80,11 +81,11 @@ class FemaleMatingModel():
                 genome = []
                 for y in range(self.matingLength):
                     genome.append(ran.ranInt(2))
-                female = FemaleGenome(genome, fit = function, memoryLength= self.memoryLength, flatcost= self.flatcost, fitbase=self.fitbase, ran=self.ran)
+                female = FemaleGenome(genome, fit = function, memoryLength= self.memoryLength, flatcost= flatcost, fitbase=fitbase, ran=self.ran)
                 self.females.append(female)
         elif (type == 0):
             for x in range(size):
-                female = FemaleThreshold(self.ran.norran(femaleSigma, femaleMu), fit = function, fitbase = self.fitbase)
+                female = FemaleThreshold(self.ran.norran(femaleSigma, femaleMu), fit = function, fitbase = fitbase,flatcost=flatcost)
                 self.females.append(female)
 
     def colData(self):
@@ -108,7 +109,7 @@ class FemaleMatingModel():
         return result
 
     def calDataThre(self):
-        result = [self.generation]
+        result = []
         fitnesses = []
         thresholds = []
         for x in range(len(self.females)):
@@ -202,16 +203,20 @@ class FemaleMatingModel():
         """
         End the evolution
         """
-        print("End of simulation. Outputing last generation.")
-        self.writeLastGen()
+        print("End of simulation")
+        if(self.femaleType == 1):
+            print("Outputing last generation.")
+            self.writeLastGen()
+            self.lastfile.close() 
         self.fitfile.close()
-        self.lastfile.close() 
 
     def evolve(self, ran):
         self.step(ran)
         data = [self.generation]
-        data += self.calDataNoThre() + self.bestWorstIndi()
-
+        if(self.femaleType == 1):
+            data += self.calDataNoThre() + self.bestWorstIndi()
+        elif(self.femaleType == 0):
+            data += self.calDataThre()
         self.writeToFile(self.fitwriter, data)
         if self.generation < self.maxGen:
             self.reproduce()
@@ -240,7 +245,7 @@ class FemaleMatingModel():
                 child.mutate(0.1, self.ran)
             elif(isinstance(parent[index], FemaleGenome)):
                 child = FemaleGenome(parent[index].genome, parent[index].fit, len(parent[index].memory),
-                parent[index].flatcost, parent[index].fitbase, parent[index].ran, parent[index].malesigma)
+                parent[index].flatcost, parent[index].fitbase, parent[index].ran)
                 child.mutate(self.mutationSigma, self.ran)
             self.females[x] = child
 
