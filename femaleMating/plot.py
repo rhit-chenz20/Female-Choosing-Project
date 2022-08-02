@@ -76,18 +76,19 @@ class Plot():
             dictionary[key] = group
         filenames = dictionary.values()
 
-        sample1 = list(dictionary.keys())[0].split('_')
-        sample2 = list(dictionary.keys())[1].split('_')
+        samples = []
+        for key in dictionary.keys():
+            sample1 = key.split('/')
+            samples.append(sample1[len(sample1)-1].split('_'))
+
         diIndex = 0
-        for x in range(len(sample1)):
-            if(sample1[x] != sample2[x]):
+        for x in range(len(samples[1])):
+            if samples[1][x] != samples[0][x]:
                 diIndex = x-1
-                break
 
         self.legends = []
-        for key in dictionary.keys():
-            li = key.split('_')
-            label = self._processwords(diIndex, li)
+        for sample in samples:
+            label = self._processwords(diIndex, sample)
             self.legends.append(label) 
 
         self._dataProcessThre(filenames)
@@ -109,6 +110,8 @@ class Plot():
                 spe = 'Average males fitness'
             elif(li[index+1] == '1'):
                 spe = 'Lowest male fitness'
+            elif(li[index+1] == '2'):
+                spe = 'Last Sperm Precedence'
             return spe
         elif(li[index] == 'fsigma'):
             return 'Female Sigma ' + li[index+1]
