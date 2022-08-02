@@ -17,7 +17,6 @@ class Plot():
         self.genoNames = ["Generation","Ave_Fitness", "All_Mate",]
         # self.genonames = ['best_mate', 'worst_mate']
         self.lastnames = ["Mating_Steps", "Fitness_Mating", "Num_Look_Before_1_Mating"]
-        self.labels = ['Average Fitness', 'Sta Dev Fitness', 'Average Threshold', 'Sta Dev Threshold']
         # self.fignames = ['ave_fit', 'sta_fit', 'ave_the', 'sta_the']
         self.output = 'ResultPlot/' + outfolder
         if not os.path.exists(self.output):
@@ -174,7 +173,7 @@ class Plot():
         self.plotFigWTher(thre_datas, datas)
 
     def plotFigWTher(self, thre, thre_conc):
-
+        self.labels = ['Average Fitness', 'Sta Dev Fitness', 'Average Threshold', 'Sta Dev Threshold']
         threNames = ["Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"]
 
         axd = plt.figure(figsize=(18,8)).subplot_mosaic(
@@ -199,7 +198,7 @@ class Plot():
                 # dots
                 for z in range(len(thre[0])):
                     thre[x][z].plot(x='Generation', y=threNames[y], ax=list(axd.values())[y], kind='scatter', c=next(color_dots),label='_nolegend_')
-            list(axd.values())[y].set(xlabel='Generation', ylabel=self.labels[y-1])
+            list(axd.values())[y].set(xlabel='Generation', ylabel=self.labels[y])
         
         list(axd.values())[1].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
 

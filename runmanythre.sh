@@ -1,5 +1,5 @@
 #!/bin/bash
-declare date="July28"
+declare date="Aug2"
 # # conda activate female-mating
 # count = 0
 # # maleMu = 5
@@ -49,19 +49,19 @@ declare date="July28"
 
 # echo "finished"
 
-# for SEL in 0 1
+# for FIT in 2
 # do
 #     for V in {1..10}
 #     do
-#         let "c+=1"
-#         echo "running $c"
-#         python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 10 -ms 3 -fsigma 3 -fmu 5 -fit 0 -fn "thre_sel_${SEL}_$V" -ft 0 -sel $SEL -d "July26"
+        # let "c+=1"
+        # echo "running $c"
+        # python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 10 -ms 3 -fsigma 3 -fmu 5 -fit 2 -fn "fit_2_1" -ft 0 -sel 0 -d ${date} -max 5 -fs 3
 #     done
 # done
 
 # let "c+=1"
 # echo "plotting $c"
-# python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/July26/thre_sel${SEL}_*.csv -outfolder July26/threshold/selection -out selection -t 0
+# python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/${date}/Threshold/fit_2_*.csv -outfolder ${date}/threshold/fitness_function -out LSP -t 0
 # echo "finished $c"
 
 
@@ -91,18 +91,18 @@ declare date="July28"
 #     done              
 # done
 
-for SEL in 0 1
-do
-    for MS in 1 5 10
-    do
-        for FS in 1 5 10
-        do
-            for FM in 1 5 10
-            do
-                for COST in 0 0.5 1
-                do
-                    for FIT in 0 1 2
-                    do
+# for SEL in 0 1
+# do
+#     for MS in 1 5 10
+#     do
+#         for FS in 1 5 10
+#         do
+#             for FM in 1 5 10
+#             do
+#                 for COST in 0 0.5 1
+#                 do
+#                     for FIT in 0 1 2
+#                     do
                         # # ploting selection
                         # let "c+=1"
                         # echo "plotting $c"
@@ -129,19 +129,19 @@ do
                         # python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/${date}/Threshold/sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_*_cost_${COST}_*.csv -outfolder ${date}/threshold/fitness_function -out sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_cost_${COST} -t 0
                         # echo "finished $c"
                         # ploting cost
-                        let "c+=1"
-                        echo "plotting $c"
-                        python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/${date}/sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT}_cost_*_*.csv -outfolder ${date}/threshold/cost -out sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT} -t 0
-                        echo "finished $c"
-                    done
-                done
-            done
-        done
-    done            
-done
                         # let "c+=1"
                         # echo "plotting $c"
-                        # python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/${date}/Threshold/sel_0_ms_*_fs_1_fmu_1_fit_1_cost_1_*.csv -outfolder ${date}/threshold/male_sigma -out sel_0_fs_1_fmu_1_fit_1_cost_1 -t 0
+                        # python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/${date}/sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT}_cost_*_*.csv -outfolder ${date}/threshold/cost -out sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT} -t 0
+                        # echo "finished $c"
+#                     done
+#                 done
+#             done
+#         done
+#     done            
+# done
+                        # let "c+=1"
+                        # echo "plotting $c"
+                        # python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/${date}/Threshold/sel_0_ms_*_fs_1_fmu_1_fit_1_cost_1_*.csv -outfolder ${date}/threshold/male_sigma/test -out test -t 0
                         # echo "finished $c"
                         
                         # let "c+=1"

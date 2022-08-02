@@ -241,7 +241,8 @@ class FemaleMatingModel():
         for x in range(len(self.females)):
             index = self.ran.ranInt(len(parent))
             if(isinstance(parent[index], FemaleThreshold)):
-                child = FemaleThreshold(parent[index].threshold, parent[index].fit)
+                child = FemaleThreshold(parent[index].threshold, parent[index].fit, 
+                flatcost=parent[index].flatcost,fitbase=parent[index].fitbase)
                 child.mutate(0.1, self.ran)
             elif(isinstance(parent[index], FemaleGenome)):
                 child = FemaleGenome(parent[index].genome, parent[index].fit, len(parent[index].memory),

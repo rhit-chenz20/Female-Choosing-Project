@@ -66,8 +66,8 @@ class FemaleThreshold(Female):
         self,
         val,
         fit,
-        flatcost = 0,
-        fitbase = 0
+        flatcost,
+        fitbase
     ):
         super().__init__(fit, flatcost, fitbase)
         self.threshold = copy.deepcopy(val)
