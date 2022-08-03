@@ -65,7 +65,7 @@ declare date="Aug2"
 # echo "finished $c"
 
 declare c=0
-declare max=40
+declare max=5
 
 for SEL in 0 1
 do
@@ -86,7 +86,7 @@ do
                                 echo "running $c"
 
                                 python3 /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 20 -ms $MS -fsigma $FS -fmu $FM -fit $FIT -fn "sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT}_cost_${COST}_$V" -ft 0 -sel $SEL -d ${date} -c $COST &
-                                if ((c>40))
+                                if ((c>$max))
                                 then
                                         wait
                                         let "c=0"
