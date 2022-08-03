@@ -65,7 +65,7 @@ done
 # echo "finished $c"
 
 declare c=0
-declare max = 40
+declare max=40
 
 for SEL in 0 1
 do
@@ -83,7 +83,7 @@ do
                         do
                                 while true
                                 do
-                                        if c < max
+                                        if c<max
                                         then
                                                 let "c+=1"
                                                 echo "running $c"
