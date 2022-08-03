@@ -32,6 +32,8 @@ class TestStringMethods(unittest.TestCase):
         self.femaleThre = FemaleThreshold(
             val = 10, 
             fit = FitnessFunction.get_fitness_function(0),
+            fitbase=0.5,
+            flatcost=0
         )
         self.femaleGeno = FemaleGenome(
             genome=[0,1,0,1,0,1],
