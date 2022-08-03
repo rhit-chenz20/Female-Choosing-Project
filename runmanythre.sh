@@ -86,8 +86,9 @@ do
                                         if c<max
                                         then
                                                 let "c+=1"
+                                                let "max=40"
                                                 echo "running $c"
-                                                python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 20 -ms $MS -fsigma $FS -fmu $FM -fit $FIT -fn "sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT}_cost_${COST}_$V" -ft 0 -sel $SEL -d ${date} -c $COST &
+                                                python3 /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 20 -ms $MS -fsigma $FS -fmu $FM -fit $FIT -fn "sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT}_cost_${COST}_$V" -ft 0 -sel $SEL -d ${date} -c $COST &
                                                 echo "finished $c"
                                                 let "c-=1"
                                                 break       
