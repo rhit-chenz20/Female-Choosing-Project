@@ -1,33 +1,33 @@
 #!/bin/bash
 declare date="Aug2"
-# # conda activate female-mating
-# count = 0
-# # maleMu = 5
-# # 4 different mating length, aka how many chances a female gets for mating
-# for ML in 1 5 10
-# do
-#     # 3 different male sigma
-#     for MS in 1 10 100
-#     do
-#         # 3 female figma
-#         for SR in 0.01 1 10
-#         do
-#             #10 trails for each set of parameters
-#             for V in {1..10}
-#             do
-#                 python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml $ML -ms $MS -fsigma $SR -fmu 5 -fit 1 -fn "ml_${ML}_ms_${MS}_mus_${MuS}_fsigma_${SR}_$V"
-#                 # pids[${count}]=$!
-#                 echo "running $count"
-#                 let "count+=1"
-#             done
-#         done
-#     done
-# done
+# conda activate female-mating
+count = 0
+# maleMu = 5
+# 4 different mating length, aka how many chances a female gets for mating
+for ML in 1 5 10
+do
+    # 3 different male sigma
+    for MS in 1 10 100
+    do
+        # 3 female figma
+        for SR in 0.01 1 10
+        do
+            #10 trails for each set of parameters
+            for V in {1..10}
+            do
+                python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml $ML -ms $MS -fsigma $SR -fmu 5 -fit 1 -fn "ml_${ML}_ms_${MS}_mus_${MuS}_fsigma_${SR}_$V"
+                # pids[${count}]=$!
+                echo "running $count"
+                let "count+=1"
+            done
+        done
+    done
+done
 
-# for pid in ${pids[*]}
-# do
-#     wait $pid
-# done
+for pid in ${pids[*]}
+do
+    wait $pid
+done
 
 # c=1
 # # 4 different mating length, aka how many chances a female gets for mating
@@ -64,7 +64,42 @@ declare date="Aug2"
 # python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/${date}/Threshold/fit_2_*.csv -outfolder ${date}/threshold/fitness_function -out LSP -t 0
 # echo "finished $c"
 
+declare c=0
+declare max = 40
 
+for SEL in 0 1
+do
+    for MS in 1 5 10
+    do
+        for FS in 1 5 10
+        do
+            for FM in 1 5 10
+            do
+                for COST in 0 1 3
+                do
+                    for FIT in 0 1 2
+                    do
+                        for V in {1..10}
+                        do
+                                while true
+                                do
+                                        if c < max
+                                        then
+                                                let "c+=1"
+                                                echo "running $c"
+                                                python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 20 -ms $MS -fsigma $FS -fmu $FM -fit $FIT -fn "sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT}_cost_${COST}_$V" -ft 0 -sel $SEL -d ${date} -c $COST &
+                                                echo "finished $c"
+                                                let "c-=1"
+                                                break       
+                                        fi
+                                done
+                        done
+                    done
+                done
+            done
+        done
+    done              
+done
 
 # for SEL in 0 1
 # do
@@ -78,32 +113,7 @@ declare date="Aug2"
 #                 do
 #                     for FIT in 0 1 2
 #                     do
-#                         for V in {1..10}
-#                         do
-#                             let "c+=1"
-#                             echo "running $c"
-#                             python /Users/andrea/Documents/GitHub/Female-Choosing-Project/run.py -ml 20 -ms $MS -fsigma $FS -fmu $FM -fit $FIT -fn "sel_${SEL}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT}_cost_${COST}_$V" -ft 0 -sel $SEL -d ${date} -c $COST
-#                         done
-#                     done
-#                 done
-#             done
-#         done
-#     done              
-# done
-
-# for SEL in 0 1
-# do
-#     for MS in 1 5 10
-#     do
-#         for FS in 1 5 10
-#         do
-#             for FM in 1 5 10
-#             do
-#                 for COST in 0 0.5 1
-#                 do
-#                     for FIT in 0 1 2
-#                     do
-                        # # ploting selection
+                        # ploting selection
                         # let "c+=1"
                         # echo "plotting $c"
                         # python /Users/andrea/Documents/GitHub/Female-Choosing-Project/plot.py -inf CSVResultFiles/${date}/Threshold/sel_*_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT}_cost_${COST}_*.csv -outfolder ${date}/threshold/selection -out ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT}_cost_${COST} -t 0
