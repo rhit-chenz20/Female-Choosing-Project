@@ -9,7 +9,7 @@ mkdir "../result/$date/plot/Threshold"
 
 declare c=0
 declare count=0
-declare max=5
+declare max=40
 
 
 for MS in 1 5 10
