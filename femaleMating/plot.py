@@ -11,17 +11,13 @@ class Plot():
         fitfilenames,
         lastfilenames,
         output,
-        outfolder,
         type
         ):
         self.genoNames = ["Generation","Ave_Fitness", "All_Mate",]
         # self.genonames = ['best_mate', 'worst_mate']
         self.lastnames = ["Mating_Steps", "Fitness_Mating", "Num_Look_Before_1_Mating"]
         # self.fignames = ['ave_fit', 'sta_fit', 'ave_the', 'sta_the']
-        self.output = 'ResultPlot/' + outfolder
-        if not os.path.exists(self.output):
-            os.makedirs(self.output)
-        self.output += "/" + output
+        self.output = output
         if(type == 1):
             self._setupGeno(fitfilenames,lastfilenames)
         elif(type == 0):
@@ -81,6 +77,9 @@ class Plot():
             samples.append(sample1[len(sample1)-1].split('_'))
 
         diIndex = 0
+
+        
+
         for x in range(len(samples[1])):
             if samples[1][x] != samples[0][x]:
                 diIndex = x-1
@@ -89,7 +88,7 @@ class Plot():
         for sample in samples:
             label = self._processwords(diIndex, sample)
             self.legends.append(label) 
-
+        # print(self.legends)
         self._dataProcessThre(filenames)
 
     def _processwords(self, index, li:list):

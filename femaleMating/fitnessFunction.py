@@ -36,4 +36,4 @@ class LastMalePrecedentFitness(FitnessFunction):
             # print(female.fitbase)
             for x in range(len(female.mates)):
                 female.fitness += math.pow(female.fitbase, len(female.mates) - x) * female.mates[x]
-            print(female.fitness)
+            # print(female.fitness)

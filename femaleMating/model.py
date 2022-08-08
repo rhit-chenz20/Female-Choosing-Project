@@ -1,7 +1,6 @@
 import statistics
 import random
 import csv
-import os
 import numpy as np
 
 from .agent import FemaleGenome, FemaleThreshold
@@ -28,17 +27,15 @@ class FemaleMatingModel():
         memoryLength,
         flatcost,
         fitbase,
-        topPercent,
-        date
+        topPercent
     ):
-        super().__init__()
-        out = "CSVResultFiles/" + date
-        if femaleType == 1:
-            out += "/Genome"
-        elif femaleType == 0:
-            out += "/Threshold"
-        if not os.path.exists(out):
-            os.makedirs(out)
+        # out = "CSVResultFiles/" + date
+        # if femaleType == 1:
+        #     out += "/Genome"
+        # elif femaleType == 0:
+        #     out += "/Threshold"
+        # if not os.path.exists(out):
+        #     os.makedirs(out)
         self.ran = Randomizer()
         self.females = []
         self.males = []
@@ -52,10 +49,10 @@ class FemaleMatingModel():
         self.mutationSigma = mutationSigma * matingLength
         self.selection = selection
         self.topPercent = topPercent
-        self.fitfile = open(out+'/' + filename + ".csv", "w+")
+        self.fitfile = open(filename + ".csv", "w+")
         self.fitwriter = csv.writer(self.fitfile)
         if(femaleType == 1):
-            self.lastfile = open(out+'/' + 'last_' +filename + ".csv", "w+")
+            self.lastfile = open(filename + ".csv", "w+")
             self.lastwriter = csv.writer(self.lastfile)    
             self.writeToFile(self.lastwriter, ["Mating_Steps", "Fitness_Mating", "Num_Look_Before_1_Mating"])
         
@@ -140,7 +137,6 @@ class FemaleMatingModel():
         # All mate
         result.append(all1)
         mate_first = self.mateFirstData()
-        # print(mate_first)
         return result + mate_first
 
     def mateFirstData(self):
@@ -152,10 +148,6 @@ class FemaleMatingModel():
                 mate_first.append(female.fitness)
             else:
                 others.append(female.fitness)
-        # print("gen "+str(self.generation)+" ")
-        # print(len(mate_first))
-        # print("gen "+str(self.generation)+" ")
-        # print(len(others))
         if len(mate_first) == 0:
             mate1 = 0
         else: mate1 = sum(mate_first)/len(mate_first)
@@ -165,7 +157,6 @@ class FemaleMatingModel():
             mate2 = 0
         else: mate2 = sum(others)/len(others)
         result.append(mate2)
-        # print(mate2)
         return result
 
     def writeLastGen(self):
