@@ -1,6 +1,7 @@
 import numpy as np
 import seaborn as sns
 import os
+import sys
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -62,6 +63,7 @@ class Plot():
         self._dataProcessGeno(fitfilenames, lastfilenames)            
 
     def _setupThre(self, ffilenames):
+        sys.stderr.write(str(ffilenames)+"\n")
         dictionary = {}  
         for x in ffilenames:  
             li = x.split('_')
