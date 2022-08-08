@@ -14,7 +14,7 @@ do
         echo "running $c"
         # pwd
         # python ~/Documents/GitHub/Female-Choosing-Project/run.py -ml 10 -ms 3 -fsigma 3 -fmu 5 -fit 2 -fn "../result/CSV/${date}/fit_2_$V" -ft 0 -sel 0 -max 5 -fs 3
-        python3 run.py -ml 10 -ms 3 -fsigma 3 -fmu 5 -fit 0 -fn "../result/${date}/CSV/Threshold/cost_${COST}_$V" -ft 0 -sel 0 -max 3000 -fs 3 -c $COST
+        python3 run.py -ml 10 -ms 3 -fsigma 3 -fmu 5 -fit 0 -fn "../result/${date}/CSV/Threshold/cost_${COST}_$V" -ft 0 -sel 0 -max 3000 -fs 3 -c $COST &
         if ((c>5))
             then
                 wait
