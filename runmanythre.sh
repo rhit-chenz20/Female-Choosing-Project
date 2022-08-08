@@ -1,11 +1,11 @@
 #!/bin/bash
 declare date="Aug8"
 mkdir "../result"
-mkdir "../result/$date"
+mkdir "../result/${date}"
 mkdir "../result/${date}/CSV"
-mkdir "../result/$date/plot"
+mkdir "../result/${date}/plot"
 mkdir "../result/${date}/CSV/Threshold"
-mkdir "../result/$date/plot/Threshold"
+mkdir "../result/${date}/plot/Threshold"
 
 declare c=0
 declare count=0
