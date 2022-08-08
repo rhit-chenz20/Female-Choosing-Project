@@ -42,7 +42,7 @@ do
         done
     done
 done              
-
+echo "finished simulation. now plotting"
 
 for MS in 1 5 10
 do
@@ -129,3 +129,4 @@ do
     done            
 done
                     
+echo "finished plotting"
