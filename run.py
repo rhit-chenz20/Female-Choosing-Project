@@ -20,6 +20,7 @@ parser.add_argument('-memol', '--memoryLength', type = int, default=0, required=
 parser.add_argument('-c', '--flatCost', type = float, default=0, required=False)
 parser.add_argument('-base', '--fitbase', type = float, default=0.5, required=False)
 parser.add_argument('-per', '--topPercent', type = float, default=0.5, required=False)
+parser.add_argument('-d', '--debug', type = bool, default=False, required=False)
 args = parser.parse_args()
 
 model = FemaleMatingModel(

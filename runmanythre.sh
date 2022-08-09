@@ -1,5 +1,5 @@
 #!/bin/bash
-declare date="Aug8"
+declare date="Aug9"
 mkdir "../result"
 mkdir "../result/${date}"
 mkdir "../result/${date}/CSV"

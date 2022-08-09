@@ -12,17 +12,20 @@ class Plot():
         fitfilenames,
         lastfilenames,
         output,
-        type
+        type,
+        debug
         ):
         self.genoNames = ["Generation","Ave_Fitness", "All_Mate",]
         # self.genonames = ['best_mate', 'worst_mate']
         self.lastnames = ["Mating_Steps", "Fitness_Mating", "Num_Look_Before_1_Mating"]
         # self.fignames = ['ave_fit', 'sta_fit', 'ave_the', 'sta_the']
         self.output = output
+        self.debug = debug
         if(type == 1):
             self._setupGeno(fitfilenames,lastfilenames)
         elif(type == 0):
             self._setupThre(fitfilenames)
+            sys.argv
 
     def _setupGeno(self,ffilenames,lfilenames):
         fitfilenames = []
@@ -63,7 +66,8 @@ class Plot():
         self._dataProcessGeno(fitfilenames, lastfilenames)            
 
     def _setupThre(self, ffilenames):
-        sys.stderr.write(str(ffilenames)+"\n")
+        if(self.debug):
+            sys.stderr.write(str(ffilenames)+"\n")
         dictionary = {}  
         for x in ffilenames:  
             li = x.split('_')
