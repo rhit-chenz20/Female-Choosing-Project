@@ -31,7 +31,13 @@ class FemaleMatingModel():
         self.topPercent = args.topPercent
         self.fitfile = open(args.filename + ".csv", "w+")
         self.fitwriter = csv.writer(self.fitfile)
-        self.lastfile = open("last_" + args.filename + ".csv", "w+")
+
+        lastfile_name=args.filename.split("/")
+        lastfile_name[len(lastfile_name)-1] = "last_" + lastfile_name[len(lastfile_name) - 1]
+        name = lastfile_name[0]
+        for x in range(1,len(lastfile_name)):
+            name += "/"+lastfile_name[x]
+        self.lastfile = open(name + ".csv", "w+")
         self.lastwriter = csv.writer(self.lastfile)
 
         if(self.femaleType == 1):
