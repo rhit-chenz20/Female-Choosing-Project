@@ -166,7 +166,7 @@ class TestStringMethods(unittest.TestCase):
         answers = [15,0,8.75]
         self.femaleThre.fit = FitnessFunction.get_fitness_function(2)
         self.femaleThre.fitbase = 0.5
-        self.femaleGeno.fitness = 0
+        self.femaleThre.fitness = 0
         self.femaleThre.flatcost = 0
         for y in range(len(sets)):
             for x in range(len(sets[y])):
@@ -177,7 +177,33 @@ class TestStringMethods(unittest.TestCase):
             self.assertEqual(len(self.femaleThre.mates), len(filtered))
             self.assertEqual(self.femaleThre.fitness, answers[y])
             self.femaleThre.mates.clear()
-            self.femaleGeno.fitness = 0
+            self.femaleThre.fitness = 0
+
+    def test_weightedFitness_negative(self):
+        sets = [[-10, -10, -10],
+        [-30, -20, -10, -10, -10],
+        [-100, -100, -20, -200, -150]]
+        self.femaleThre.fit = FitnessFunction.get_fitness_function(2)
+        self.femaleThre.fitbase = 0.5
+        self.femaleThre.fitness = 0
+        self.femaleThre.flatcost = 0
+        thresholds = [-10, -20, -30, -150]
+        answers=[[-8.75, -8.75, -8.75, -8.75],
+        [-8.75, -10, -10.9375, -10.9375],
+        [0,-10, -10, -98.75]]
+        for y in range(len(sets)):
+            for i in range(len(thresholds)):
+                self.femaleThre.threshold = thresholds[i]
+                for x in range(len(sets[y])):
+                    self.femaleThre.setCurrentMale(sets[y][x])
+                    self.femaleThre.step()
+                filtered = list(filter(lambda male: male >= self.femaleThre.threshold, sets[y]))         
+                self.assertEqual(len(self.femaleThre.mates), len(filtered))
+                self.assertEqual(self.femaleThre.fitness, answers[y][i])
+
+                self.femaleThre.mates.clear()
+                self.femaleThre.fitness = 0
+
 
 if __name__ == '__main__':
     unittest.main()
