@@ -24,21 +24,22 @@ parser.add_argument('-d', '--debug', type = bool, default=False, required=False)
 args = parser.parse_args()
 
 model = FemaleMatingModel(
-    femaleSize = args.femaleSize,
-    matingLength = args.matingLength,
-    maleSigma = args.maleSigma,
-    mutationSigma = args.mutationLamda,
-    generations = args.maxGen,
-    femaleSigma =  args.femaleSigma,
-    femaleMu = args.femaleMu,
-    selection = args.selection,
-    fitness=args.fitnessFunction,
-    filename = args.filename,
-    femaleType = args.femaleType,
-    memoryLength= args.memoryLength,
-    flatcost=args.flatCost,
-    fitbase = args.fitbase,
-    topPercent= args.topPercent,
+    args=args
+    # femaleSize = args.femaleSize,
+    # matingLength = args.matingLength,
+    # maleSigma = args.maleSigma,
+    # mutationSigma = args.mutationLamda,
+    # generations = args.maxGen,
+    # femaleSigma =  args.femaleSigma,
+    # femaleMu = args.femaleMu,
+    # selection = args.selection,
+    # fitness=args.fitnessFunction,
+    # filename = args.filename,
+    # femaleType = args.femaleType,
+    # memoryLength= args.memoryLength,
+    # flatcost=args.flatCost,
+    # fitbase = args.fitbase,
+    # topPercent= args.topPercent,
 )
 
 model.start()
