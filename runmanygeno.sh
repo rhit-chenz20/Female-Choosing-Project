@@ -9,7 +9,7 @@ mkdir "../result/${date}/plot/Learning"
 
 declare c=0
 declare count=0
-declare max=40
+declare max=30
 
 # for MS in 1
 # do

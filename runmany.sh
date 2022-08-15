@@ -11,7 +11,7 @@ mkdir "../result/${date}/plot/Threshold"
 
 declare c=0
 declare count=0
-declare max=40
+declare max=30
 
 # learning model
 for MS in 1 5 10
