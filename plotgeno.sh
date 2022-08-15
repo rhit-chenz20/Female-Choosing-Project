@@ -62,6 +62,7 @@ do
                             wait
                             let "c=0"
                         fi
+                        done
                     done
                 done
             done
