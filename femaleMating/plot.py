@@ -223,7 +223,7 @@ class Plot():
     def plotFigWOThre(self, fitdatas, best, worst, lasts):
         mosaic = "AB\nCD"
 
-        letters = ['E', 'F', 'G', 'H', 'I', 'J', 'K', 'L']
+        letters = ['E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'J', 'K','L','M','N','O','P','Q','R','S','T']
 
         for x in range(2*len(best)):
             mosaic+="\n"+letters[x]+letters[x]

@@ -72,4 +72,4 @@ done
                     
 echo "finished plotting"
 
-# bash runmany.sh
+bash runmany.sh
