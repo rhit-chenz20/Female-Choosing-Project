@@ -4,6 +4,7 @@ import os
 import sys
 import pandas as pd
 import matplotlib.pyplot as plt
+import scipy.stats as stats
 
 # get help from https://stackoverflow.com/a/48126960
 class Plot():
@@ -18,16 +19,14 @@ class Plot():
         self.genoNames = ["Generation","Ave_Fitness", "All_Mate",]
         # self.genonames = ['best_mate', 'worst_mate']
         self.lastnames = ["Mating_Steps", "Fitness_Mating", "Num_Look_Before_1_Mating"]
-        # self.fignames = ['ave_fit', 'sta_fit', 'ave_the', 'sta_the']
+        # self.fignames = ["Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"]
         self.output = output
         self.debug = debug
-        if(type == 1):
-            self._setupGeno(fitfilenames,lastfilenames)
-        elif(type == 0):
-            self._setupThre(fitfilenames)
-            sys.argv
 
-    def _setupGeno(self,ffilenames,lfilenames):
+        self._setup_filename(fitfilenames,lastfilenames, type)
+        sys.argv
+
+    def _setup_filename(self,ffilenames,lfilenames, type):
         fitfilenames = []
         lastfilenames = []
         dictionary = {}  
@@ -49,43 +48,12 @@ class Plot():
 
         lastfilenames = gdictionary.values()
 
-        sample1 = list(dictionary.keys())[0].split('_')
-        sample2 = list(dictionary.keys())[1].split('_')
-        diIndex = 0
-        for x in range(len(sample1)):
-            if(sample1[x] != sample2[x]):
-                diIndex = x-1
-                break
-
-        self.legends = []
-        for key in dictionary.keys():
-            li = key.split('_')
-            label = self._processwords(diIndex, li)
-            self.legends.append(label)
-            self.legends.append(label + ' CI')    
-        self._dataProcessGeno(fitfilenames, lastfilenames)            
-
-    def _setupThre(self, ffilenames):
-        if(self.debug):
-            sys.stderr.write(str(ffilenames)+"\n")
-        dictionary = {}  
-        for x in ffilenames:  
-            li = x.split('_')
-            key = x[:x.index(li[len(li)-1])]
-            group = dictionary.get(key,[])
-            group.append(x)  
-            dictionary[key] = group
-        filenames = dictionary.values()
-
         samples = []
         for key in dictionary.keys():
             sample1 = key.split('/')
             samples.append(sample1[len(sample1)-1].split('_'))
 
         diIndex = 0
-
-        
-
         for x in range(len(samples[1])):
             if samples[1][x] != samples[0][x]:
                 diIndex = x-1
@@ -94,8 +62,40 @@ class Plot():
         for sample in samples:
             label = self._processwords(diIndex, sample)
             self.legends.append(label) 
-        # print(self.legends)
-        self._dataProcessThre(filenames)
+
+        if(type == 1):
+            self._dataProcessGeno(fitfilenames, lastfilenames)    
+        elif(type ==0):
+            self._dataProcessThre(fitfilenames, lastfilenames)        
+
+    # def _setupThre(self, ffilenames):
+    #     if(self.debug):
+    #         sys.stderr.write(str(ffilenames)+"\n")
+    #     dictionary = {}  
+    #     for x in ffilenames:  
+    #         li = x.split('_')
+    #         key = x[:x.index(li[len(li)-1])]
+    #         group = dictionary.get(key,[])
+    #         group.append(x)  
+    #         dictionary[key] = group
+    #     filenames = dictionary.values()
+
+    #     samples = []
+    #     for key in dictionary.keys():
+    #         sample1 = key.split('/')
+    #         samples.append(sample1[len(sample1)-1].split('_'))
+
+    #     diIndex = 0
+    #     for x in range(len(samples[1])):
+    #         if samples[1][x] != samples[0][x]:
+    #             diIndex = x-1
+
+    #     self.legends = []
+    #     for sample in samples:
+    #         label = self._processwords(diIndex, sample)
+    #         self.legends.append(label) 
+    #     # print(self.legends)
+    #     self._dataProcessThre(filenames)
 
     def _processwords(self, index, li:list):
         if(li[index] == "ms"):
@@ -157,27 +157,36 @@ class Plot():
 
         for x in range(len(fit_datas)):
             fit_datas[x] = pd.concat(objs=fit_datas[x], ignore_index=True)
-            bests[x] = pd.concat(objs=bests[x]).groupby("Generation").mean().T
-            worsts[x] = pd.concat(objs = worsts[x]).groupby("Generation").mean().T
-            lasts[x] = pd.concat(objs = lasts[x]).groupby("Generation").mean()
+            bests[x] = pd.concat(objs=bests[x]).groupby(level=0).mean().T
+            worsts[x] = pd.concat(objs = worsts[x]).groupby(level=0).mean().T
+            lasts[x] = pd.concat(objs = lasts[x]).groupby(level=0).mean()
             # print(lasts[x])
 
         self.plotFigWOThre(fit_datas, bests, worsts, lasts)
 
-    def _dataProcessThre(self, filenames):
+    def _dataProcessThre(self, filenames,lastfilenames):
         thre_datas = []
         datas = []
+        lasts = []
         for stack1 in filenames:
             thre_data = []
             for file1 in stack1:
                 df1 = pd.read_csv(file1, index_col=False).reset_index()
                 thre_data.append(df1)
             thre_datas.append(thre_data) 
+
+        for stack2 in lastfilenames:
+            last = []
+            for file2 in stack2:
+                df2 = pd.read_csv(file2, index_col=False)
+                last.append(df2)
+            lasts.append(last)
         for x in range(len(thre_datas)):
             datas.append(pd.concat(objs=thre_datas[x], ignore_index=True).groupby("Generation").mean())
-        self.plotFigWTher(thre_datas, datas)
+            lasts[x] = pd.concat(objs = lasts[x]).groupby(level=0).mean()
+        self.plotFigWTher(thre_datas, datas, lasts)
 
-    def plotFigWTher(self, thre, thre_conc):
+    def plotFigWTher(self, thre, thre_conc, lasts):
         self.labels = ['Average Fitness', 'Sta Dev Fitness', 'Average Threshold', 'Sta Dev Threshold']
         threNames = ["Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"]
 
@@ -185,32 +194,31 @@ class Plot():
         """
         AB
         CD
+        EE
         """,
         )
-        color = []
-        
-        # four graph
-        for y in range(len(threNames)):
-            color_lines = iter(plt.cm.rainbow(np.linspace(0, 1, len(thre_conc))))
-            # 2 sets
-            for x in range(len(thre_conc)):
-                c_line=next(color_lines)
-                
-                color.append(c_line)
+
+        color_lines = iter(plt.cm.rainbow(np.linspace(0, 1, len(self.legends))))
+
+        # n sets of data (same length as legends)
+        for x in range(len(thre_conc)):
+            c_line=next(color_lines)
+            # four graph
+            for y in range(len(threNames)):
                 sns.regplot(x=thre_conc[x]['index'],y=thre_conc[x][threNames[y]], lowess=True, 
-                    scatter=False, ax = list(axd.values())[y], color = c_line)
-                color_dots = iter(plt.cm.rainbow(np.linspace(0, 1, len(thre[0]))))
-                # dots
+                    scatter=False, ax = list(axd.values())[y], color = c_line, ci=95)
                 for z in range(len(thre[0])):
-                    thre[x][z].plot(x='Generation', y=threNames[y], ax=list(axd.values())[y], kind='scatter', c=next(color_dots),label='_nolegend_')
+                    thre[x][z].plot(x='Generation', y=threNames[y], ax=list(axd.values())[y], kind='line', c=c_line,label='_nolegend_', alpha=0.1)
             list(axd.values())[y].set(xlabel='Generation', ylabel=self.labels[y])
+            axd["E"].hist(lasts[x], color=c_line)
         
         list(axd.values())[1].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
+        axd["E"].set(xlabel='Number of Matings', ylabel="Number of Females")
 
         identify_axes(axd)
         plt.tight_layout()
-        # plt.show()
-        plt.savefig(self.output + ".png")
+        # plt.show() 
+        plt.savefig(self.output + ".pdf")
 
     def plotFigWOThre(self, fitdatas, best, worst, lasts):
         mosaic = "AB\nCD"
@@ -234,8 +242,8 @@ class Plot():
             # self.lineplot(axd['D'],lasts[x],'Num_Look_Before_1_Mating','Fitness_Mating',"Look Steps before First Mate","Female's Fitness",c)
 
         for x in range(len(best)):
-            self.plotHeatmap(axd[letters[2*x]], best[x].to_numpy(), 'Best Female of '+self.legends[2*x], 'Steps')
-            self.plotHeatmap(axd[letters[2*x+1]], worst[x].to_numpy(), 'Worst Female of '+self.legends[2*x], 'Steps')
+            self.plotHeatmap(axd[letters[2*x]], best[x].to_numpy(), 'Best Female of '+self.legends[x], 'Steps')
+            self.plotHeatmap(axd[letters[2*x+1]], worst[x].to_numpy(), 'Worst Female of '+self.legends[x], 'Steps')
             # self.plotHeatmap(axd[letters[2*x]], best[x].to_numpy(), 'Best Female of ', 'Steps')
             # self.plotHeatmap(axd[letters[2*x+1]], worst[x].to_numpy(), 'Worst Female of ', 'Steps')
         

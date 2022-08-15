@@ -1,5 +1,5 @@
 #!/bin/bash
-declare date="Aug9"
+declare date="Aug14"
 mkdir "../result"
 mkdir "../result/${date}"
 mkdir "../result/${date}/CSV"
@@ -12,24 +12,24 @@ declare count=0
 declare max=40
 
 
-for MS in 1 5 10
+for MS in 1
 do
-    for FS in 1 5 10
+    for FS in 10
     do
-        for FM in 1 5 10
+        for FM in 1
         do
-            for COST in 0 1 3
+            for COST in 0
             do
-                for FIT in 0 1 2
+                for FIT in 0
                 do
-                    for ML in 1 5 10 20
+                    for ML in 3 5
                     do
-                        for V in {1..10}
+                        for V in {1..5}
                         do
                             let "count+=1"
                             echo "running $count"
 
-                            python3 run.py -ml $ML -ms $MS -fsigma $FS -fmu $FM -fit $FIT -fn "../result/${date}/CSV/Threshold/ml_${ML}_ms_${MS}_fs_${FS}_fmu_${FM}_fit_${FIT}_cost_${COST}_$V" -ft 0 -sel 0 -c $COST -max 3000 &
+                            python3 run.py -ml $ML -ms $MS -fsigma $FS -fmu $FM -fit $FIT -fn "../result/${date}/CSV/Threshold/ml_${ML}_ms_${MS}_fit_${FIT}_cost_${COST}_$V" -ft 0 -sel 0 -c $COST -max 500
                             if ((count>$max))
                             then
                                 wait
@@ -44,3 +44,4 @@ do
 done              
 echo "finished simulation. now plotting"
 
+bash plotthre.sh
