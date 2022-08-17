@@ -221,11 +221,11 @@ class Plot():
             # self.lineplot(axd['D'],lasts[x],'Num_Look_Before_1_Mating','Fitness_Mating',"Look Steps before First Mate","Female's Fitness",c)
 
         for x in range(0,len(best),2):
-            self.plotHeatmap(axd[letters[2*x]], best[x].to_numpy(), 'Best Female of '+self.legends[x], 'Steps')
-            self.plotHeatmap(axd[letters[2*x+1]], worst[x].to_numpy(), 'Worst Female of '+self.legends[x], 'Steps')
+            self.plotHeatmap(axd[letters[x]], best[x].to_numpy(), 'Best Female of '+self.legends[x], 'Steps')
+            self.plotHeatmap(axd[letters[x+1]], worst[x].to_numpy(), 'Worst Female of '+self.legends[x+1], 'Steps')
             # self.plotHeatmap(axd[letters[2*x]], best[x].to_numpy(), 'Best Female of ', 'Steps')
             # self.plotHeatmap(axd[letters[2*x+1]], worst[x].to_numpy(), 'Worst Female of ', 'Steps')
-        list(axd.values())[1].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
+        axd["B"].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
 
         identify_axes(axd)
         plt.tight_layout()
