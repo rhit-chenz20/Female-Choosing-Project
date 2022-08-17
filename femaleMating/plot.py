@@ -62,40 +62,12 @@ class Plot():
         for sample in samples:
             label = self._processwords(diIndex, sample)
             self.legends.append(label) 
+            self.legends.append(label+" CI") 
 
         if(type == 1):
             self._dataProcessGeno(fitfilenames, lastfilenames)    
         elif(type ==0):
             self._dataProcessThre(fitfilenames, lastfilenames)        
-
-    # def _setupThre(self, ffilenames):
-    #     if(self.debug):
-    #         sys.stderr.write(str(ffilenames)+"\n")
-    #     dictionary = {}  
-    #     for x in ffilenames:  
-    #         li = x.split('_')
-    #         key = x[:x.index(li[len(li)-1])]
-    #         group = dictionary.get(key,[])
-    #         group.append(x)  
-    #         dictionary[key] = group
-    #     filenames = dictionary.values()
-
-    #     samples = []
-    #     for key in dictionary.keys():
-    #         sample1 = key.split('/')
-    #         samples.append(sample1[len(sample1)-1].split('_'))
-
-    #     diIndex = 0
-    #     for x in range(len(samples[1])):
-    #         if samples[1][x] != samples[0][x]:
-    #             diIndex = x-1
-
-    #     self.legends = []
-    #     for sample in samples:
-    #         label = self._processwords(diIndex, sample)
-    #         self.legends.append(label) 
-    #     # print(self.legends)
-    #     self._dataProcessThre(filenames)
 
     def _processwords(self, index, li:list):
         if(li[index] == "ms"):
@@ -182,13 +154,14 @@ class Plot():
                 last.append(df2)
             lasts.append(last)
         for x in range(len(thre_datas)):
-            datas.append(pd.concat(objs=thre_datas[x], ignore_index=True).groupby("Generation").mean())
+            datas.append(pd.concat(objs=thre_datas[x], ignore_index=True))
             lasts[x] = pd.concat(objs = lasts[x]).groupby(level=0).mean()
         self.plotFigWTher(thre_datas, datas, lasts)
 
     def plotFigWTher(self, thre, thre_conc, lasts):
-        self.labels = ['Average Fitness', 'Sta Dev Fitness', 'Average Threshold', 'Sta Dev Threshold']
+        labels = ['Average Fitness', 'Sta Dev Fitness', 'Average Threshold', 'Sta Dev Threshold']
         threNames = ["Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"]
+        letters = ['A','B','C','D']
 
         axd = plt.figure(figsize=(18,8)).subplot_mosaic(
         """
@@ -203,14 +176,19 @@ class Plot():
         # n sets of data (same length as legends)
         for x in range(len(thre_conc)):
             c_line=next(color_lines)
+            
             # four graph
+
             for y in range(len(threNames)):
-                sns.regplot(x=thre_conc[x]['index'],y=thre_conc[x][threNames[y]], lowess=True, 
-                    scatter=False, ax = list(axd.values())[y], color = c_line, ci=95)
-                for z in range(len(thre[0])):
-                    thre[x][z].plot(x='Generation', y=threNames[y], ax=list(axd.values())[y], kind='line', c=c_line,label='_nolegend_', alpha=0.1)
-            list(axd.values())[y].set(xlabel='Generation', ylabel=self.labels[y])
-            axd["E"].hist(lasts[x], color=c_line)
+                self.lineplot(axd[letters[y]],thre_conc[x],'Generation',threNames[y],"Generation",labels[y],c_line)
+                # for z in range(len(thre[0])):
+                #     thre[x][z].plot(x='Generation', y=threNames[y], ax=axd[letters[y]], kind='line', c=c_line,label='_nolegend_')
+            axd["E"].hist(lasts[x], color=c_line, alpha=0.5)
+                
+        #         sns.regplot(x=thre_conc[x]['index'],y=thre_conc[x][threNames[y]], lowess=True, 
+        #             scatter=False, ax = list(axd.values())[y], color = c_line, ci=95)
+                        #     list(axd.values())[y].set(xlabel='Generation', ylabel=self.labels[y])
+        #     
         
         list(axd.values())[1].legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
         axd["E"].set(xlabel='Number of Matings', ylabel="Number of Females")
@@ -234,6 +212,7 @@ class Plot():
         colo = iter(plt.cm.rainbow(np.linspace(0, 1, len(fitdatas))))
         for x in range(len(fitdatas)):
             c = next(colo)
+            # print(fitdatas[x])
             self.lineplot(axd['A'],fitdatas[x],'Generation','Ave_Fitness',"Generation","Average Fitness",c)
             self.lineplot(axd['B'],fitdatas[x],'Generation','All_Mate',"Generation","All Mating Steps",c)
             sns.regplot(x=lasts[x]['Mating_Steps'],y=lasts[x]['Fitness_Mating'], lowess=True, scatter=True, ax = axd['C'], color = c)
@@ -260,7 +239,7 @@ class Plot():
             marker='', color = c
         )
         ax.set(xlabel=xlabel, ylabel=ylabel)
-        ax.legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
+        # ax.legend(loc='upper left', labels=self.legends,bbox_to_anchor=(1.02, 1))
 
     def plotHeatmap(self, ax, li, title, ylabel):
         sns.heatmap(li, ax =ax, cmap="Greens",vmin=0, vmax=1)
