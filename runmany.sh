@@ -1,5 +1,5 @@
 #!/bin/bash
-declare date="Aug14"
+declare date="Aug17"
 mkdir "../result"
 mkdir "../result/${date}"
 mkdir "../result/${date}/CSV"
@@ -46,6 +46,7 @@ do
 done              
 echo "finished simulation"
 
+# Threshold
 for MS in 1 5 10
 do
     for FS in 10
