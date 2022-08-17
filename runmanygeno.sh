@@ -57,12 +57,12 @@ do
                 do
                     for ML in 3 5
                     do
-                        for V in {1..100}
+                        for V in {1..10}
                         do
                             let "count+=1"
                             echo "running $count"
 
-                            python3 run.py -ml $ML -ms $MS -fsigma $FS -fmu $FM -fit $FIT -fn "../result/${date}/CSV/Learning/ml_${ML}_ms_${MS}_fit_${FIT}_cost_${COST}_$V" -ft 1 -sel 0 -c $COST -max 5000 -memol $ML &
+                            python3 run.py -ml $ML -ms $MS -fsigma $FS -fmu $FM -fit $FIT -fn "../result/${date}/CSV/Learning/ml_${ML}_ms_${MS}_fit_${FIT}_cost_${COST}_$V" -ft 1 -sel 0 -c $COST -max 500 -memol $ML
                             if ((count>$max))
                             then
                                 wait
