@@ -6,7 +6,8 @@ class Female():
         self,
         fit,
         flatcost,
-        fitBase
+        fitBase,
+        mlambda
     ):
         """
         Create a new Female.
@@ -16,6 +17,7 @@ class Female():
         self.mates = []
         self.fitbase = fitBase
         self.flatcost = flatcost
+        self.lamda = mlambda
 
     
     """
@@ -23,7 +25,6 @@ class Female():
     """
     def step(self):
         self.mate()
-        self.calFitness()
 
     def calFitness(self):
         self.fit.cal_fitness(self)
@@ -37,7 +38,7 @@ class Female():
         pass
 
     @abstractmethod
-    def mutate(self, sigma, ran):
+    def mutate(self, ran):
         pass
             
     def adjustCost(self):
@@ -64,13 +65,14 @@ class FemaleThreshold(Female):
 
     def __init__(
         self,
-        val,
-        fit,
+        threshold,
+        mlambda,
+        fitness_function,
         flatcost,
         fitbase
     ):
-        super().__init__(fit, flatcost, fitbase)
-        self.threshold = copy.deepcopy(val)
+        super().__init__(fitness_function, flatcost, fitbase, mlambda)
+        self.threshold = copy.deepcopy(threshold)
 
     """
     Mate with current male
@@ -85,14 +87,15 @@ class FemaleThreshold(Female):
     """
     Mutate current threshold
     """
-    def mutate(self, sigma, ran):
-        self.threshold += ran.valmu(sigma)
+    def mutate(self, ran):
+        self.threshold += ran.valmu(self.lamda)
 
 class FemaleGenome(Female):
     def __init__(
         self,
         genome,
-        fit,
+        mlambda,
+        fitness_function,
         memoryLength,
         flatcost,
         fitbase,
@@ -101,7 +104,8 @@ class FemaleGenome(Female):
         """
         Create a new Female.
         """
-        super().__init__(fit,fitbase, flatcost)
+        super().__init__(fitness_function,fitbase, flatcost, mlambda)
+        self.mlambda = mlambda
         self.genome = copy.deepcopy(genome)
         self.memory = [None] * memoryLength
         self.threshold = 0
@@ -146,8 +150,8 @@ class FemaleGenome(Female):
         else:
             self.threshold = 0
 
-    def mutate(self, lamda, ran):
-        size = ran.poisson(lamda)
+    def mutate(self, ran):
+        size = ran.poisson(self.lamda)
         self.selected = []
         if(size > len(self.genome)):
             size = len(self.genome)
@@ -160,4 +164,3 @@ class FemaleGenome(Female):
                 self.genome[index] = 0
             elif(self.genome[index] == 0):
                 self.genome[index] = 1
-

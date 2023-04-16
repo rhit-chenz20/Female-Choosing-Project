@@ -1,10 +1,8 @@
 import numpy as np
 import seaborn as sns
-import os
 import sys
 import pandas as pd
 import matplotlib.pyplot as plt
-import scipy.stats as stats
 
 # get help from https://stackoverflow.com/a/48126960
 class Plot():
@@ -14,7 +12,8 @@ class Plot():
         lastfilenames,
         output,
         type,
-        debug
+        debug,
+        gap
         ):
         self.genoNames = ["Generation","Ave_Fitness", "All_Mate",]
         # self.genonames = ['best_mate', 'worst_mate']
@@ -22,7 +21,7 @@ class Plot():
         # self.fignames = ["Ave_Fitness", "Std_Fitness", "Ave_Threshold", "Std_Threhold"]
         self.output = output
         self.debug = debug
-
+        self.gap = gap
         self._setup_filename(fitfilenames,lastfilenames, type)
         sys.argv
 
@@ -115,7 +114,7 @@ class Plot():
                 df1 = pd.read_csv(file1, index_col=False).reset_index()
                 fit_data.append(df1.filter(items=self.genoNames))
                 best_data.append(df1.loc[:, df1.columns!='Generation'].filter(regex="^best_mate"))
-                worst_data.append(df1.loc[:, df1.columns!='Generation'].filter(regex="^worst_mate"))
+                worst_data.append(df1.loc[:, (df1.columns!='Generation') & (df1.index %self.gap == 0)].filter(regex="^worst_mate"))
             fit_datas.append(fit_data) 
             bests.append(best_data)
             worsts.append(worst_data)

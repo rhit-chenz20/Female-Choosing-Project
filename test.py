@@ -31,12 +31,14 @@ class TestStringMethods(unittest.TestCase):
         self.ran = Randomizer()
         self.femaleThre = FemaleThreshold(
             val = 10, 
+            mlambda = 1,
             fit = FitnessFunction.get_fitness_function(0),
             fitbase=0.5,
             flatcost=0
         )
         self.femaleGeno = FemaleGenome(
             genome=[0,1,0,1,0,1],
+            mlambda = 1,
             fit=FitnessFunction.get_fitness_function(0),
             memoryLength=3,
             flatcost=2,
@@ -46,13 +48,13 @@ class TestStringMethods(unittest.TestCase):
 
     def test_mutate(self):
         self.ran.int = 1
-        self.femaleThre.mutate(1,self.ran)
+        self.femaleThre.mutate(self.ran)
         self.assertEqual(self.femaleThre.threshold, 11)
         self.ran.int = -1
-        self.femaleThre.mutate(1,self.ran)
+        self.femaleThre.mutate(self.ran)
         self.assertEqual(self.femaleThre.threshold, 10)
         self.ran.int = 0
-        self.femaleThre.mutate(1,self.ran)
+        self.femaleThre.mutate(self.ran)
         self.assertEqual(self.femaleThre.threshold, 10)
 
     def test_currentMate(self):
@@ -76,6 +78,7 @@ class TestStringMethods(unittest.TestCase):
             for x in range(len(sets[y])):
                 self.femaleThre.setCurrentMale(sets[y][x])
                 self.femaleThre.step()
+            self.femaleThre.calFitness()
             filtered = list(filter(lambda male: male >= self.femaleThre.threshold, sets[y]))
             self.assertEqual(len(self.femaleThre.mates), len(filtered))
             if(len(filtered) != 0):
@@ -93,6 +96,7 @@ class TestStringMethods(unittest.TestCase):
             for x in range(len(sets[y])):
                 self.femaleThre.setCurrentMale(sets[y][x])
                 self.femaleThre.step()
+            self.femaleThre.calFitness()
             filtered = list(filter(lambda male: male >= self.femaleThre.threshold, sets[y]))
             self.assertEqual(len(self.femaleThre.mates), len(filtered))
             if(len(filtered) != 0):
@@ -111,6 +115,7 @@ class TestStringMethods(unittest.TestCase):
             for x in range(len(sets[y])):
                 self.femaleThre.setCurrentMale(sets[y][x])
                 self.femaleThre.step()
+            self.femaleThre.calFitness()
             filtered = list(filter(lambda male: male >= self.femaleThre.threshold, sets[y]))
             self.assertEqual(len(self.femaleThre.mates), len(filtered))
             if(len(filtered) != 0):
@@ -128,7 +133,7 @@ class TestStringMethods(unittest.TestCase):
             for x in range(len(sets[y])):
                 self.femaleGeno.setCurrentMale(sets[y][x])
                 self.femaleGeno.step()
-            
+            self.femaleGeno.calFitness()
             self.assertEqual(len(self.femaleGeno.memory), 3)
             if(x == 0):
                 self.assertEqual(self.femaleGeno.memory, [sets[y][0], None, None])
@@ -143,19 +148,19 @@ class TestStringMethods(unittest.TestCase):
         self.ran.int = 2
         self.femaleGeno.genome = [0,1,0,1,0,1]
         self.ran.ite = iter([0,1,2,3])
-        self.femaleGeno.mutate(1,self.ran)
+        self.femaleGeno.mutate(self.ran)
         self.assertEqual(self.femaleGeno.selected, [0,1])
         self.assertEqual(self.femaleGeno.genome, [1,0,0,1,0,1])
         self.ran.int = 10
         self.femaleGeno.genome = [0,1,0,1,0,1]
         self.ran.ite = iter([0,1,2,3,4,5])
-        self.femaleGeno.mutate(1,self.ran)
+        self.femaleGeno.mutate(self.ran)
         self.assertEqual(self.femaleGeno.selected, [0,1,2,3,4,5])
         self.assertEqual(self.femaleGeno.genome, [1,0,1,0,1,0])
         self.ran.int = 3
         self.femaleGeno.genome = [0,1,0,1,0,1]
         self.ran.ite = iter([0,0,0,3,4,5])        
-        self.femaleGeno.mutate(1,self.ran)
+        self.femaleGeno.mutate(self.ran)
         self.assertEqual(self.femaleGeno.selected, [0,3,4])
         self.assertEqual(self.femaleGeno.genome, [1,1,0,0,1,1])
 
@@ -172,6 +177,7 @@ class TestStringMethods(unittest.TestCase):
             for x in range(len(sets[y])):
                 self.femaleThre.setCurrentMale(sets[y][x])
                 self.femaleThre.step()
+            self.femaleThre.calFitness()
             filtered = list(filter(lambda male: male >= self.femaleThre.threshold, sets[y]))
             
             self.assertEqual(len(self.femaleThre.mates), len(filtered))
@@ -197,13 +203,13 @@ class TestStringMethods(unittest.TestCase):
                 for x in range(len(sets[y])):
                     self.femaleThre.setCurrentMale(sets[y][x])
                     self.femaleThre.step()
+                self.femaleThre.calFitness()
                 filtered = list(filter(lambda male: male >= self.femaleThre.threshold, sets[y]))         
                 self.assertEqual(len(self.femaleThre.mates), len(filtered))
                 self.assertEqual(self.femaleThre.fitness, answers[y][i])
 
                 self.femaleThre.mates.clear()
                 self.femaleThre.fitness = 0
-
 
 if __name__ == '__main__':
     unittest.main()

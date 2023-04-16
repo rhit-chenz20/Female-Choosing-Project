@@ -22,6 +22,7 @@ class Top50(Selection):
         """
         Choose the top ?% of females as the parent
         """
+        females.sort(reverse=True)
         parent = []
         for x in range(int(len(females)*self.top)):
             parent.append(females[x])
@@ -40,6 +41,7 @@ class Tournament(Selection):
         """
         Use the tournament selection to choose parent
         """
+        self.females.sort(reverse=True)
         parent = []
         for x in range(int(len(females)/2)):
             index1 = self.ran.ranInt(len(females))

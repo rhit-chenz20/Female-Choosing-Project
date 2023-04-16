@@ -27,7 +27,6 @@ declare max=30
 #                         do
 #                             let "count+=1"
 #                             echo "running $count"
-
 #                             python3 run.py -ml $ML -ms $MS -fsigma $FS -fmu $FM -fit $FIT -fn "../result/${date}/CSV/Learning/ml_${ML}_ms_${MS}_fit_${FIT}_cost_${COST}_$V" -ft 1 -sel 0 -c $COST -max 500
 #                             # if ((count>$max))
 #                             # then

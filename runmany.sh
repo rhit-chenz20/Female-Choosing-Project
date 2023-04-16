@@ -1,13 +1,10 @@
 #!/bin/bash
-declare date="Aug17"
+declare date="Apr16"
 mkdir "../result"
 mkdir "../result/${date}"
 mkdir "../result/${date}/CSV"
-mkdir "../result/${date}/plot"
-mkdir "../result/${date}/CSV/Learning"
-mkdir "../result/${date}/plot/Learning"
 mkdir "../result/${date}/CSV/Threshold"
-mkdir "../result/${date}/plot/Threshold"
+mkdir "../result/${date}/CSV/Learning"
 
 declare c=0
 declare count=0
@@ -79,4 +76,4 @@ do
 done              
 echo "finished simulation. now plotting"
 
-bash plotmany.sh
+# bash plotmany.sh

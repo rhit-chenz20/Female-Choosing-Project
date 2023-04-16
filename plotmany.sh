@@ -1,6 +1,10 @@
-declare date="Aug17"
+declare date="Sep26"
 declare c=0
 declare max=30
+
+mkdir ../result/${date}/plot
+mkdir ../result/${date}/plot/Learning
+mkdir ../result/${date}/plot/Threshold
 
 mkdir ../result/${date}/plot/Learning/mating_length
 mkdir ../result/${date}/plot/Learning/male_sigma
