@@ -1,0 +1,2 @@
+Genome,Ave_fit_x,Std_fit_x,Ave_thr_x,Std_thr_x,Seed_x,Num_Learning_x,Num_Mating_x,Ave_fit_y,Std_fit_y,Sum_fit,Ave_thr_y,Std_thr_y,Seed_y,Num_Learning_y,Num_Mating_y
+"[1, 1, 0, 1, 1, 1, 0, 0, 1, 0]",0.9969754775925994,6.22754400584187,10.0153239719197,2.18236653996006,15562,6,4,1.0107216089193503,4.800465092091559,6.124212803310111,10.003856571447324,2.1414161203954327,86934,6,4
